@@ -4,18 +4,35 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
+using UnityEngine.Tilemaps;
 
 public class MapGeneration : MonoBehaviour
 {
+    [Header("Room Generation")]
     [SerializeField]
-    private int max_count_ = 10;
-    [SerializeField]
-    private float height_ = 5f;
-    [SerializeField]
-    private float width_ = 5f;
+    private GameObject tile_map_;
 
     [SerializeField]
-    private GameObject prefab_;
+    private TileBase tile_base_;
+
+    [SerializeField]
+    private Transform grid_parent_;
+
+    private List<Transform> room_list_ = new List<Transform>();
+
+    private float tile_size_ = 32;
+
+    [SerializeField]
+    private int min_width_;
+    [SerializeField]
+    private int min_height_;
+    [SerializeField]
+    private int max_width_;
+    [SerializeField]
+    private int max_height_;
+
+    [SerializeField]
+    private int room_count_ = 10;
 
     private List<Vertex> vertex_list_ = new List<Vertex>();
     private List<Triangle> all_tri_list_ = new List<Triangle>();
@@ -26,19 +43,7 @@ public class MapGeneration : MonoBehaviour
 
     private void Start()
     {
-        for (int i = 0; i < max_count_; i++)
-        {
-            float cur_x = Random.RandomRange(-width_, width_);
-            float cur_y = Random.RandomRange(-height_, height_);
-
-            vertex_list_.Add(new Vertex(i, cur_x, cur_y));
-
-            GameObject.Instantiate(prefab_, new Vector3(cur_x, cur_y), Quaternion.identity);
-        }
-
-        getTriangleComb();
-        setupCheckedTriangle();
-        setupGraph();
+        generationRoom(room_count_);
     }
 
     private void Update()
@@ -46,6 +51,101 @@ public class MapGeneration : MonoBehaviour
         foreach (var item in kruskal_graph_)
         {
             item.drawDebug();
+        }
+    }
+
+    private void generationRoom(int _room_size)
+    {
+        for (int i = 0; i < _room_size; i++)
+        {
+            generateRoom();
+        }
+        onColliderComponent();
+        StartCoroutine(offColliderComponentWaitForSec(5f));
+    }
+
+    private void onColliderComponent()
+    {
+        foreach (var room in room_list_)
+        {
+            room.GetComponent<BoxCollider2D>().enabled = true;
+        }
+    }
+
+    private void offColliderComponent()
+    {
+        foreach (var room in room_list_)
+        {
+            room.GetComponent<BoxCollider2D>().enabled = false;
+        }
+    }
+
+    private IEnumerator offColliderComponentWaitForSec(float _delay)
+    {
+        Time.timeScale = 10f;
+        yield return new WaitForSeconds(_delay);
+        Time.timeScale = 1f;
+        correctRoomPosition();
+        convertRoomToVertex();
+        getTriangleComb();
+        setupCheckedTriangle();
+        setupGraph();
+        offColliderComponent();
+    }
+
+    private void correctRoomPosition()
+    {
+        foreach (var room in room_list_)
+        {
+            float corrected_x = 0.32f * Mathf.FloorToInt(room.position.x / 0.32f);
+            float corrected_y = 0.32f * Mathf.FloorToInt(room.position.y / 0.32f);
+
+            room.position = new Vector3(corrected_x, corrected_y, 0);
+        }
+    }
+
+    private void generateRoom()
+    {
+        int width = Random.RandomRange(min_width_, max_width_);
+        int height = Random.RandomRange(min_height_, max_height_);
+        int random_angle = Random.RandomRange(0, 360);
+
+        var go = GameObject.Instantiate(tile_map_, new Vector3(Mathf.Cos(random_angle), Mathf.Sin(random_angle), 0), Quaternion.identity);
+        var col = go.GetComponent<BoxCollider2D>();
+        var tile_map = go.GetComponent<Tilemap>();
+        col.size = new Vector2(width * 0.32f, height * 0.32f);
+        col.offset = new Vector2(col.size.x / 2f, col.size.y / 2f);
+        go.transform.SetParent(grid_parent_);
+
+        room_list_.Add(go.transform);
+
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height; j++)
+            {
+                tile_map.SetTile(new Vector3Int(i, j, 0), tile_base_);
+            }
+        }
+    }
+
+    private void convertRoomToVertex()
+    {
+        var rand_arr = getShuffleArray(room_list_.Count);
+        int selected_idx = 20;
+
+        for (int i = 0; i < room_list_.Count; i++)
+        {
+            int cur_idx = rand_arr[i];
+            if (i < selected_idx)
+            {
+                
+                var bc = room_list_[cur_idx].GetComponent<BoxCollider2D>();
+                vertex_list_.Add(new Vertex(i, room_list_[cur_idx].position.x + bc.offset.x, room_list_[cur_idx].position.y + bc.offset.y));
+            }
+            else
+            {
+                room_list_[cur_idx].gameObject.active = false;
+            }
         }
     }
 
@@ -101,12 +201,12 @@ public class MapGeneration : MonoBehaviour
 
     private void setupGraph()
     {
-        bool[,] is_value = new bool[max_count_, max_count_];
+        bool[,] is_value = new bool[room_count_, room_count_];
         List<LineData> line_graph_list = new List<LineData>();
 
-        for (int i = 0; i < max_count_; i++)
+        for (int i = 0; i < room_count_; i++)
         {
-            for (int j = 0; j < max_count_; j++)
+            for (int j = 0; j < room_count_; j++)
             {
                 is_value[i, j] = false;
             }
@@ -171,7 +271,36 @@ public class MapGeneration : MonoBehaviour
             if (kruskal_graph_.Count == vertex_list_.Count - 1) return;
         }
     }
+
+    public int[] getShuffleArray(int _size)
+    {
+        int[] shuffle_arr = Enumerable.Range(0, _size).ToArray();
+        System.Random random = new System.Random();
+        shuffle_arr = shuffle_arr.OrderBy(x => random.Next()).ToArray();
+        return shuffle_arr;
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 public class Vertex
 {
