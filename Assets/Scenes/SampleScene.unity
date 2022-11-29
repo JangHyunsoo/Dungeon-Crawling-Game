@@ -242,7 +242,7 @@ MonoBehaviour:
   min_height_: 5
   max_width_: 10
   max_height_: 10
-  room_count_: 100
+  room_count_: 80
 --- !u!4 &1403001774
 Transform:
   m_ObjectHideFlags: 0

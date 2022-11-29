@@ -44,6 +44,7 @@ public class MapGeneration : MonoBehaviour
     private void Start()
     {
         generationRoom(room_count_);
+
     }
 
     private void Update()
@@ -82,15 +83,21 @@ public class MapGeneration : MonoBehaviour
 
     private IEnumerator offColliderComponentWaitForSec(float _delay)
     {
+
         Time.timeScale = 10f;
         yield return new WaitForSeconds(_delay);
         Time.timeScale = 1f;
         correctRoomPosition();
+
+
+        Testing test = new Testing();
+        room_list_ = test.logic(room_list_, 20);
+        offColliderComponent();
+
         convertRoomToVertex();
         getTriangleComb();
         setupCheckedTriangle();
         setupGraph();
-        offColliderComponent();
     }
 
     private void correctRoomPosition()
@@ -131,21 +138,11 @@ public class MapGeneration : MonoBehaviour
     private void convertRoomToVertex()
     {
         var rand_arr = getShuffleArray(room_list_.Count);
-        int selected_idx = 20;
 
         for (int i = 0; i < room_list_.Count; i++)
         {
-            int cur_idx = rand_arr[i];
-            if (i < selected_idx)
-            {
-                
-                var bc = room_list_[cur_idx].GetComponent<BoxCollider2D>();
-                vertex_list_.Add(new Vertex(i, room_list_[cur_idx].position.x + bc.offset.x, room_list_[cur_idx].position.y + bc.offset.y));
-            }
-            else
-            {
-                room_list_[cur_idx].gameObject.active = false;
-            }
+            var bc = room_list_[i].GetComponent<BoxCollider2D>();
+            vertex_list_.Add(new Vertex(i, room_list_[i].position.x + bc.offset.x, room_list_[i].position.y + bc.offset.y));
         }
     }
 
@@ -201,14 +198,14 @@ public class MapGeneration : MonoBehaviour
 
     private void setupGraph()
     {
-        bool[,] is_value = new bool[room_count_, room_count_];
+        float[,] is_value = new float[room_count_, room_count_];
         List<LineData> line_graph_list = new List<LineData>();
 
         for (int i = 0; i < room_count_; i++)
         {
             for (int j = 0; j < room_count_; j++)
             {
-                is_value[i, j] = false;
+                is_value[i, j] = -1f;
             }
         }
 
@@ -218,13 +215,21 @@ public class MapGeneration : MonoBehaviour
 
             foreach (var line_data in lines)
             {
-                if(!is_value[line_data.start.no, line_data.end.no])
+                if (is_value[line_data.start.no, line_data.end.no] == -1f)
                 {
                     line_graph_list.Add(line_data);
-                    is_value[line_data.start.no, line_data.end.no] = true;
+                    is_value[line_data.start.no, line_data.end.no] = line_data.getDistance();
                 }
             }
         }
+
+        line_graph_list.Sort(delegate (LineData _one, LineData _other)
+        {
+            var distance = _one.getDistance() - _other.getDistance();
+            if (distance > 0) return 1;
+            else if (distance < 0) return -1;
+            else return 0;
+        });
 
         vertex_graph_ = line_graph_list.ToArray();
 
@@ -282,26 +287,6 @@ public class MapGeneration : MonoBehaviour
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 public class Vertex
 {
     public int no;
@@ -339,7 +324,7 @@ public class Triangle
         data.Add(new KeyValuePair<float, Vertex>(Mathf.Atan2(center.x - _p2.x, center.y - _p2.y), _p2));
         data.Add(new KeyValuePair<float, Vertex>(Mathf.Atan2(center.x - _p3.x, center.y - _p3.y), _p3));
 
-        data.Sort(delegate(KeyValuePair<float, Vertex> one, KeyValuePair<float, Vertex> other)
+        data.Sort(delegate (KeyValuePair<float, Vertex> one, KeyValuePair<float, Vertex> other)
         {
             if (one.Key > other.Key) return -1;
             else if (one.Key == other.Key) return 0;
@@ -405,7 +390,7 @@ public class LineData
     public Vertex end;
     public LineData(Vertex _start, Vertex _end)
     {
-        if(_start.no >= _end.no)
+        if (_start.no >= _end.no)
         {
             start = _start;
             end = _end;
@@ -415,13 +400,13 @@ public class LineData
             start = _end;
             end = _start;
         }
-        
+
     }
     public float getDistance()
     {
-        return 1;
-        //return Vector2.Distance(start.getVecter3(), end.getVecter3());
+        return Vector2.Distance(start.getVecter3(), end.getVecter3());
     }
+
     public void drawDebug()
     {
         Debug.DrawLine(start.getVecter3(), end.getVecter3(), Color.red);
