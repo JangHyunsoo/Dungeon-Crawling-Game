@@ -11,14 +11,10 @@ public class MapGeneration : MonoBehaviour
     [Header("Room Generation")]
     [SerializeField]
     private GameObject tile_map_;
-
     [SerializeField]
     private TileBase tile_base_;
-
     [SerializeField]
     private Transform grid_parent_;
-
-    private List<Transform> room_list_ = new List<Transform>();
 
     private float tile_size_ = 32;
 
@@ -32,27 +28,38 @@ public class MapGeneration : MonoBehaviour
     private int max_height_;
 
     [SerializeField]
-    private int room_count_ = 10;
+    private int generation_room_count_;
+    [SerializeField]
+    private int selecte_room_count_;
 
+    private List<Transform> room_list_ = new List<Transform>();
     private List<Vertex> vertex_list_ = new List<Vertex>();
-    private List<Triangle> all_tri_list_ = new List<Triangle>();
-    private List<Triangle> checked_tri_list_ = new List<Triangle>();
-
+    private Triangle[] triangle_arr_;
     private LineData[] vertex_graph_;
-    private List<LineData> kruskal_graph_ = new List<LineData>();
+
+    private bool[,] tile_exist_;
+
+    private bool is_map_init_ = false;
 
     private void Start()
     {
-        generationRoom(room_count_);
-
+        is_map_init_ = false;
+        gernationMap();
     }
 
     private void Update()
     {
-        foreach (var item in kruskal_graph_)
+        if (!is_map_init_) return;
+
+        foreach (var item in vertex_graph_)
         {
             item.drawDebug();
         }
+    }
+
+    private void gernationMap()
+    {
+        StartCoroutine(gernationMapCoroutine(5f));
     }
 
     private void generationRoom(int _room_size)
@@ -62,7 +69,6 @@ public class MapGeneration : MonoBehaviour
             generateRoom();
         }
         onColliderComponent();
-        StartCoroutine(offColliderComponentWaitForSec(5f));
     }
 
     private void onColliderComponent()
@@ -81,23 +87,22 @@ public class MapGeneration : MonoBehaviour
         }
     }
 
-    private IEnumerator offColliderComponentWaitForSec(float _delay)
+    private IEnumerator gernationMapCoroutine(float _delay)
     {
-
+        generationRoom(generation_room_count_);
         Time.timeScale = 10f;
         yield return new WaitForSeconds(_delay);
         Time.timeScale = 1f;
         correctRoomPosition();
-
-
-        Testing test = new Testing();
-        room_list_ = test.logic(room_list_, 20);
-        offColliderComponent();
-
+        selecteRoom();
         convertRoomToVertex();
         getTriangleComb();
         setupCheckedTriangle();
         setupGraph();
+        calculKruskal();
+        setupTileArray();
+        selecte_room_count_ = vertex_list_.Count;
+        is_map_init_ = true;
     }
 
     private void correctRoomPosition()
@@ -135,6 +140,54 @@ public class MapGeneration : MonoBehaviour
         }
     }
 
+    private void selecteRoom()
+    {
+        var random_integer_arr = getShuffleArray(room_list_.Count);
+        var selected_room_list = new List<Transform>();
+        int selected_room_count = 0;
+
+        for (int i = 0; i < room_list_.Count && selected_room_count < selecte_room_count_; i++)
+        {
+            var cur_room_tr_ = room_list_[i];
+            if (cur_room_tr_.gameObject.active)
+            {
+                selected_room_list.Add(cur_room_tr_);
+                selected_room_count++;
+                var box_collider = cur_room_tr_.GetComponent<BoxCollider2D>();
+                box_collider.enabled = false;
+                var col_size = box_collider.size + Vector2.one * 0.64f;
+                var room_pivot = cur_room_tr_.transform.position + new Vector3(box_collider.offset.x, box_collider.offset.y);
+
+                var hits = Physics2D.OverlapBoxAll(room_pivot, col_size, 360f);
+
+                foreach (var hit in hits)
+                {
+                    hit.transform.gameObject.SetActive(false);
+                }
+            }
+        }
+
+        foreach (var room_tr in room_list_)
+        {
+            room_tr.gameObject.active = false;
+        }
+
+        foreach (var seledted_room_tr in selected_room_list)
+        {
+            seledted_room_tr.gameObject.active = true;
+        }
+
+        foreach (var room_tr in room_list_)
+        {
+            if (room_tr.gameObject.active == false)
+            {
+                Destroy(room_tr.gameObject);
+            }
+        }
+
+        room_list_ = selected_room_list;
+    }
+
     private void convertRoomToVertex()
     {
         var rand_arr = getShuffleArray(room_list_.Count);
@@ -146,9 +199,39 @@ public class MapGeneration : MonoBehaviour
         }
     }
 
+    private void getTriangleComb()
+    {
+        int r = 3;
+        List<Triangle> result = new List<Triangle>();
+        Combination(result, new List<Vertex>(), 3, 0);
+
+        triangle_arr_ = result.ToArray();
+    }
+
+    private void Combination(List<Triangle> result, List<Vertex> comb, int r, int depth)
+    {
+        if (r == 0)
+        {
+            result.Add(new Triangle(comb[0], comb[1], comb[2]));
+        }
+        else if (depth == vertex_list_.Count)
+        {
+            return;
+        }
+        else
+        {
+            Combination(result, new List<Vertex>(comb), r, depth + 1);
+
+            comb.Add(vertex_list_[depth]);
+            Combination(result, new List<Vertex>(comb), r - 1, depth + 1);
+        }
+    }
+
     private void setupCheckedTriangle()
     {
-        foreach (var tri in all_tri_list_)
+        List<Triangle> result = new List<Triangle>();
+
+        foreach (var tri in triangle_arr_)
         {
             bool flag = true;
 
@@ -162,63 +245,36 @@ public class MapGeneration : MonoBehaviour
             }
             if (flag)
             {
-                checked_tri_list_.Add(tri);
+                result.Add(tri);
             }
         }
-    }
 
-    private void getTriangleComb()
-    {
-        all_tri_list_.Clear();
-
-        int r = 3;
-        List<Vertex> comb = new List<Vertex>();
-
-        Combination(vertex_list_, comb, 3, 0);
-    }
-
-    private void Combination(List<Vertex> arr, List<Vertex> comb, int r, int depth)
-    {
-        if (r == 0)
-        {
-            all_tri_list_.Add(new Triangle(comb[0], comb[1], comb[2]));
-        }
-        else if (depth == arr.Count)
-        {
-            return;
-        }
-        else
-        {
-            Combination(new List<Vertex>(arr), new List<Vertex>(comb), r, depth + 1);
-
-            comb.Add(arr[depth]);
-            Combination(new List<Vertex>(arr), new List<Vertex>(comb), r - 1, depth + 1);
-        }
+        triangle_arr_ = result.ToArray();
     }
 
     private void setupGraph()
     {
-        float[,] is_value = new float[room_count_, room_count_];
+        bool[,] is_value = new bool[selecte_room_count_, selecte_room_count_];
         List<LineData> line_graph_list = new List<LineData>();
 
-        for (int i = 0; i < room_count_; i++)
+        for (int i = 0; i < selecte_room_count_; i++)
         {
-            for (int j = 0; j < room_count_; j++)
+            for (int j = 0; j < selecte_room_count_; j++)
             {
-                is_value[i, j] = -1f;
+                is_value[i, j] = false;
             }
         }
 
-        foreach (var triangle in checked_tri_list_)
+        foreach (var triangle in triangle_arr_)
         {
             var lines = triangle.getLineData();
 
             foreach (var line_data in lines)
             {
-                if (is_value[line_data.start.no, line_data.end.no] == -1f)
+                if (!is_value[line_data.start.no, line_data.end.no])
                 {
                     line_graph_list.Add(line_data);
-                    is_value[line_data.start.no, line_data.end.no] = line_data.getDistance();
+                    is_value[line_data.start.no, line_data.end.no] = true;
                 }
             }
         }
@@ -232,10 +288,6 @@ public class MapGeneration : MonoBehaviour
         });
 
         vertex_graph_ = line_graph_list.ToArray();
-
-        calculKruskal();
-
-        Debug.Log(kruskal_graph_.Count);
     }
 
     private int findRoot(int[] parent, int x)
@@ -254,6 +306,7 @@ public class MapGeneration : MonoBehaviour
 
     private void calculKruskal()
     {
+        List<LineData> result = new List<LineData>();
         int[] parent = new int[vertex_list_.Count];
 
         for (int i = 0; i < parent.Length; i++)
@@ -270,11 +323,25 @@ public class MapGeneration : MonoBehaviour
 
             if (findRoot(parent, f) == findRoot(parent, s)) continue;
 
-            kruskal_graph_.Add(cur_edge);
+            result.Add(cur_edge);
             unionRoot(parent, f, s);
 
-            if (kruskal_graph_.Count == vertex_list_.Count - 1) return;
+            if (vertex_graph_.Length == vertex_list_.Count - 1) return;
         }
+
+        vertex_graph_ = result.ToArray();
+    }
+
+    private void setupTileArray()
+    {
+        int map_min_x = int.MinValue;
+        int map_min_y = int.MinValue;
+        int map_max_x = int.MaxValue;
+        int map_max_y = int.MaxValue;
+
+        
+
+        
     }
 
     public int[] getShuffleArray(int _size)
