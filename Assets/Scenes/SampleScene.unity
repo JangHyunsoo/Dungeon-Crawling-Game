@@ -238,12 +238,13 @@ MonoBehaviour:
   tile_map_: {fileID: 2274436731946258830, guid: 03272eaf6d8dcf14bb1fbee81d8b6263, type: 3}
   tile_base_: {fileID: 11400000, guid: 973fbb104156b994c9059abd7b93f786, type: 2}
   grid_parent_: {fileID: 1728633576}
+  road_tile_: {fileID: 8877615986076119777, guid: 28311f1504fd8164f94c94b51545dae1, type: 3}
   min_width_: 5
   min_height_: 5
   max_width_: 10
   max_height_: 10
-  generation_room_count_: 20
-  selecte_room_count_: 20
+  generation_room_count_: 500
+  selecte_room_count_: 100
 --- !u!4 &1403001774
 Transform:
   m_ObjectHideFlags: 0

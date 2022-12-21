@@ -3,8 +3,8 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Random = UnityEngine.Random;
 using UnityEngine.Tilemaps;
+using Random = UnityEngine.Random;
 
 public class MapGeneration : MonoBehaviour
 {
@@ -17,6 +17,9 @@ public class MapGeneration : MonoBehaviour
     private Transform grid_parent_;
 
     private float tile_size_ = 32;
+
+    [SerializeField]
+    private GameObject road_tile_;
 
     [SerializeField]
     private int min_width_;
@@ -32,10 +35,13 @@ public class MapGeneration : MonoBehaviour
     [SerializeField]
     private int selecte_room_count_;
 
-    private List<Transform> room_list_ = new List<Transform>();
+    private List<Transform> room_tr_list_ = new List<Transform>();
+    private List<Room> room_arr_ = new List<Room>();
     private List<Vertex> vertex_list_ = new List<Vertex>();
     private Triangle[] triangle_arr_;
     private LineData[] vertex_graph_;
+
+    private List<KeyValuePair<Direction, Vector2>> room_under_vec_ = new List<KeyValuePair<Direction, Vector2>>();
 
     private bool[,] tile_exist_;
 
@@ -55,11 +61,33 @@ public class MapGeneration : MonoBehaviour
         {
             item.drawDebug();
         }
+
+        foreach (var item in room_under_vec_)
+        {
+            switch (item.Key)
+            {
+                case Direction.TOP:
+                    Debug.DrawLine(item.Value, item.Value + Vector2.one * 0.1f, Color.white);
+                    break;
+                case Direction.BOTTOM:
+                    Debug.DrawLine(item.Value, item.Value + Vector2.one * 0.1f, Color.black);
+                    break;
+                case Direction.LEFT:
+                    Debug.DrawLine(item.Value, item.Value + Vector2.one * 0.1f, Color.blue);
+                    break;
+                case Direction.RIGHT:
+                    Debug.DrawLine(item.Value, item.Value + Vector2.one * 0.1f, Color.yellow);
+                    break;
+                default:
+                    break;
+            }
+            
+        }
     }
 
     private void gernationMap()
     {
-        StartCoroutine(gernationMapCoroutine(5f));
+        StartCoroutine(gernationMapCoroutine(10f));
     }
 
     private void generationRoom(int _room_size)
@@ -73,7 +101,7 @@ public class MapGeneration : MonoBehaviour
 
     private void onColliderComponent()
     {
-        foreach (var room in room_list_)
+        foreach (var room in room_tr_list_)
         {
             room.GetComponent<BoxCollider2D>().enabled = true;
         }
@@ -81,7 +109,7 @@ public class MapGeneration : MonoBehaviour
 
     private void offColliderComponent()
     {
-        foreach (var room in room_list_)
+        foreach (var room in room_tr_list_)
         {
             room.GetComponent<BoxCollider2D>().enabled = false;
         }
@@ -90,7 +118,7 @@ public class MapGeneration : MonoBehaviour
     private IEnumerator gernationMapCoroutine(float _delay)
     {
         generationRoom(generation_room_count_);
-        Time.timeScale = 10f;
+        Time.timeScale = 20f;
         yield return new WaitForSeconds(_delay);
         Time.timeScale = 1f;
         correctRoomPosition();
@@ -101,13 +129,14 @@ public class MapGeneration : MonoBehaviour
         setupGraph();
         calculKruskal();
         setupTileArray();
+        linkRooms();
         selecte_room_count_ = vertex_list_.Count;
         is_map_init_ = true;
     }
 
     private void correctRoomPosition()
     {
-        foreach (var room in room_list_)
+        foreach (var room in room_tr_list_)
         {
             float corrected_x = 0.32f * Mathf.FloorToInt(room.position.x / 0.32f);
             float corrected_y = 0.32f * Mathf.FloorToInt(room.position.y / 0.32f);
@@ -115,7 +144,7 @@ public class MapGeneration : MonoBehaviour
             room.position = new Vector3(corrected_x, corrected_y, 0);
         }
     }
-
+    
     private void generateRoom()
     {
         int width = Random.RandomRange(min_width_, max_width_);
@@ -129,7 +158,7 @@ public class MapGeneration : MonoBehaviour
         col.offset = new Vector2(col.size.x / 2f, col.size.y / 2f);
         go.transform.SetParent(grid_parent_);
 
-        room_list_.Add(go.transform);
+        room_tr_list_.Add(go.transform);
 
         for (int i = 0; i < width; i++)
         {
@@ -142,23 +171,23 @@ public class MapGeneration : MonoBehaviour
 
     private void selecteRoom()
     {
-        var random_integer_arr = getShuffleArray(room_list_.Count);
+        var random_integer_arr = Utility.getShuffleArray(room_tr_list_.Count);
         var selected_room_list = new List<Transform>();
         int selected_room_count = 0;
 
-        for (int i = 0; i < room_list_.Count && selected_room_count < selecte_room_count_; i++)
+        for (int i = 0; i < room_tr_list_.Count && selected_room_count < selecte_room_count_; i++)
         {
-            var cur_room_tr_ = room_list_[i];
+            var cur_room_tr_ = room_tr_list_[i];
             if (cur_room_tr_.gameObject.active)
             {
                 selected_room_list.Add(cur_room_tr_);
                 selected_room_count++;
                 var box_collider = cur_room_tr_.GetComponent<BoxCollider2D>();
                 box_collider.enabled = false;
-                var col_size = box_collider.size + Vector2.one * 0.64f;
+                var col_size = box_collider.size + Vector2.one * 0.65f;
                 var room_pivot = cur_room_tr_.transform.position + new Vector3(box_collider.offset.x, box_collider.offset.y);
 
-                var hits = Physics2D.OverlapBoxAll(room_pivot, col_size, 360f);
+                var hits = Physics2D.OverlapBoxAll(room_pivot, col_size, 0f);
 
                 foreach (var hit in hits)
                 {
@@ -167,7 +196,7 @@ public class MapGeneration : MonoBehaviour
             }
         }
 
-        foreach (var room_tr in room_list_)
+        foreach (var room_tr in room_tr_list_)
         {
             room_tr.gameObject.active = false;
         }
@@ -177,7 +206,7 @@ public class MapGeneration : MonoBehaviour
             seledted_room_tr.gameObject.active = true;
         }
 
-        foreach (var room_tr in room_list_)
+        foreach (var room_tr in room_tr_list_)
         {
             if (room_tr.gameObject.active == false)
             {
@@ -185,17 +214,16 @@ public class MapGeneration : MonoBehaviour
             }
         }
 
-        room_list_ = selected_room_list;
+        room_tr_list_ = selected_room_list;
     }
 
     private void convertRoomToVertex()
     {
-        var rand_arr = getShuffleArray(room_list_.Count);
-
-        for (int i = 0; i < room_list_.Count; i++)
+        for (int i = 0; i < room_tr_list_.Count; i++)
         {
-            var bc = room_list_[i].GetComponent<BoxCollider2D>();
-            vertex_list_.Add(new Vertex(i, room_list_[i].position.x + bc.offset.x, room_list_[i].position.y + bc.offset.y));
+            var bc = room_tr_list_[i].GetComponent<BoxCollider2D>();
+            room_arr_.Add(new Room(i, room_tr_list_[i]));
+            vertex_list_.Add(new Vertex(i, room_tr_list_[i].position.x + bc.offset.x, room_tr_list_[i].position.y + bc.offset.y));
         }
     }
 
@@ -206,7 +234,7 @@ public class MapGeneration : MonoBehaviour
         Combination(result, new List<Vertex>(), 3, 0);
 
         triangle_arr_ = result.ToArray();
-    }
+    } 
 
     private void Combination(List<Triangle> result, List<Vertex> comb, int r, int depth)
     {
@@ -331,6 +359,213 @@ public class MapGeneration : MonoBehaviour
 
         vertex_graph_ = result.ToArray();
     }
+    
+    private Vector2Int getTilePos(Vector2 _real_pos)
+    {
+        return new Vector2Int(Mathf.RoundToInt((_real_pos.x - 0.16f) / 0.32f), Mathf.RoundToInt((_real_pos.y - 0.16f) / 0.32f));
+    }
+
+    private Vector2 getRealPos(Vector2Int _tile_pos)
+    {
+        return new Vector2(_tile_pos.x * 0.32f + 0.16f, _tile_pos.y * 0.32f + 0.16f);
+    }
+
+    private Vector2 getIncludeTilePos(Direction _dir ,Vector2 _pos)
+    {
+        var correct_vec = _pos + Utility.direction_to_vector[_dir] * 0.01f;
+        var temp = new Vector2Int(Mathf.RoundToInt((correct_vec.x - 0.16f) / 0.32f), Mathf.RoundToInt((correct_vec.y - 0.16f) / 0.32f));
+        return getRealPos(temp);
+    }
+
+    private void linkRooms()
+    {
+        foreach (var line in vertex_graph_)
+        {
+            linkRoom(line);
+        }
+    }
+
+    private void linkRoom(LineData _line)
+    {
+        Room start_room = room_arr_[_line.start.no];
+        Room end_room = room_arr_[_line.end.no];
+        Vector3 start_room_pos = _line.start.getVecter3();
+        Vector3 end_room_pos = _line.end.getVecter3();
+        
+        // start pos
+        Vector3 dir = end_room_pos - start_room_pos;
+        float dir_angle = Mathf.Atan2(dir.y, dir.x);
+
+        var start_door = getRoadStartInfo(start_room, dir_angle);
+
+        //end pos
+        dir = start_room_pos - end_room_pos;
+        dir_angle = Mathf.Atan2(dir.y, dir.x);
+
+        var end_door = getRoadStartInfo(end_room, dir_angle);
+
+        connectVertex(start_door, end_door);
+    }
+
+    private void connectVertex(KeyValuePair<Direction, Vector2> start, KeyValuePair<Direction, Vector2> end)
+    {
+        var dir = end.Value - start.Value;
+        var dir_int = getTilePos(end.Value) - getTilePos(start.Value);
+        
+
+        if((start.Key == Direction.LEFT && end.Key == Direction.RIGHT) || (start.Key == Direction.RIGHT && end.Key == Direction.LEFT))
+        {
+            int curr_x = 0;
+            int incr_x = dir_int.x > 0 ? 1 : -1;
+            while (true)
+            {
+                if((curr_x > dir_int.x / 2 && incr_x < 0) || (curr_x < dir_int.x / 2 && incr_x > 0))
+                {
+                    GameObject.Instantiate(road_tile_, new Vector2(start.Value.x + curr_x * 0.32f, start.Value.y), Quaternion.identity);
+                }
+                else if(curr_x == dir_int.x / 2)
+                {
+                    int curr_y = 0;
+                    int incr_y = dir_int.y > 0 ? 1 : -1;
+                    while (true)
+                    {
+                        GameObject.Instantiate(road_tile_, new Vector2(start.Value.x + curr_x * 0.32f, start.Value.y + curr_y * 0.32f), Quaternion.identity);
+                        if (curr_y == dir_int.y) break;
+                        curr_y += incr_y;
+                    }
+                }
+                else
+                {
+                    GameObject.Instantiate(road_tile_, new Vector2(start.Value.x + curr_x * 0.32f, end.Value.y), Quaternion.identity);
+                }
+
+                if (curr_x == dir_int.x) break;
+                curr_x += incr_x;
+            }
+        }
+        else if ((start.Key == Direction.BOTTOM && end.Key == Direction.TOP) || (start.Key == Direction.TOP && end.Key == Direction.BOTTOM))
+        {
+            int curr_y = 0;
+            int incr_y = dir_int.y > 0 ? 1 : -1;
+            while (true)
+            {
+                if ((curr_y > dir_int.y / 2 && incr_y < 0) || (curr_y < dir_int.y / 2 && incr_y > 0))
+                {
+                    GameObject.Instantiate(road_tile_, new Vector2(start.Value.x, start.Value.y + curr_y * 0.32f), Quaternion.identity);
+                }
+                else if (curr_y == dir_int.y / 2)
+                {
+                    int curr_x = 0;
+                    int incr_x = dir_int.x > 0 ? 1 : -1;
+                    while (true)
+                    {
+                        GameObject.Instantiate(road_tile_, new Vector2(start.Value.x + curr_x * 0.32f, start.Value.y + curr_y * 0.32f), Quaternion.identity);
+                        if (curr_x == dir_int.x) break;
+                        curr_x += incr_x;
+                    }
+                }
+                else
+                {
+                    GameObject.Instantiate(road_tile_, new Vector2(end.Value.x, start.Value.y + curr_y * 0.32f), Quaternion.identity);
+                }
+
+                if (curr_y == dir_int.y) break;
+                curr_y += incr_y;
+            }
+        }
+        else
+        {
+            if(start.Key == Direction.BOTTOM || start.Key == Direction.TOP)
+            {
+                createRoad(start.Key, start.Value, Mathf.Abs(dir_int.y));
+            }
+            else
+            {
+                createRoad(start.Key, start.Value, Mathf.Abs(dir_int.x));
+            }
+            if (end.Key == Direction.BOTTOM || end.Key == Direction.TOP)
+            {
+                createRoad(end.Key, end.Value, Mathf.Abs(dir_int.y) + 1);
+            }
+            else
+            {
+                createRoad(end.Key, end.Value, Mathf.Abs(dir_int.x) + 1);
+            }
+        }
+    }
+
+    private void createRoad(Direction _direction, Vector2 _pos, int _length)
+    {
+        for (int i = 0; i < _length; i++)
+        {
+            GameObject.Instantiate(road_tile_, _pos + Utility.direction_to_vector[_direction] * i * 0.32f, Quaternion.identity);
+        }
+    }
+
+    private Direction checkRoomDirection(Room _room, float angle)
+    {
+        float lr_side = Mathf.Atan2(_room.room_size.y, _room.room_size.x);
+        float tb_side = Mathf.PI / 2 - lr_side;
+
+        if (angle < 0) angle += 2 * Mathf.PI;
+
+        if ((angle < lr_side && angle >= 0) || (2 * Mathf.PI - lr_side <= angle && angle <= 2 * Mathf.PI))
+        {
+            return Direction.RIGHT;
+        }
+        else if (angle >= lr_side && angle < lr_side + 2 * tb_side)
+        {
+            return Direction.TOP;
+        }
+        else if (angle >= lr_side + 2 * tb_side && angle < 3 * lr_side + 2 * tb_side)
+        {
+            return Direction.LEFT;
+        }
+        else
+        {
+            return Direction.BOTTOM;
+        }
+    }
+
+    private KeyValuePair<Direction, Vector2> getRoadStartInfo(Room _room, float angle)
+    {
+        Direction dir = checkRoomDirection(_room, angle);
+        Vector2 origin_pos = _room.getVector2();
+        Vector2 pos = Vector2.zero;
+
+        switch (dir)
+        {
+            case Direction.TOP:
+                {
+                    float x = origin_pos.x + (_room.room_size.y / 2) / Mathf.Tan(angle);
+                    pos = new Vector2(x, origin_pos.y + _room.room_size.y / 2);
+                    break;
+                }
+            case Direction.BOTTOM:
+                {
+                    float x = origin_pos.x + (_room.room_size.y / 2) / Mathf.Tan(angle) * -1;
+                    pos = new Vector2(x, origin_pos.y - _room.room_size.y / 2);
+                    break;
+                }
+            case Direction.LEFT:
+                {
+                    float y = origin_pos.y + (_room.room_size.x / 2) * Mathf.Tan(angle) * -1;
+                    pos = new Vector2(origin_pos.x - _room.room_size.x / 2, y);
+                    break;
+                }
+            case Direction.RIGHT:
+                {
+                    float y = origin_pos.y + (_room.room_size.x / 2) * Mathf.Tan(angle);
+                    pos = new Vector2(origin_pos.x + _room.room_size.x / 2, y);
+                    break;
+                }
+            default:
+                break;
+        }
+        pos = getIncludeTilePos(dir, pos);
+
+        return new KeyValuePair<Direction, Vector2>(dir, pos);
+    }
 
     private void setupTileArray()
     {
@@ -342,14 +577,6 @@ public class MapGeneration : MonoBehaviour
         
 
         
-    }
-
-    public int[] getShuffleArray(int _size)
-    {
-        int[] shuffle_arr = Enumerable.Range(0, _size).ToArray();
-        System.Random random = new System.Random();
-        shuffle_arr = shuffle_arr.OrderBy(x => random.Next()).ToArray();
-        return shuffle_arr;
     }
 }
 
@@ -467,8 +694,8 @@ public class LineData
             start = _end;
             end = _start;
         }
-
     }
+
     public float getDistance()
     {
         return Vector2.Distance(start.getVecter3(), end.getVecter3());
@@ -477,5 +704,36 @@ public class LineData
     public void drawDebug()
     {
         Debug.DrawLine(start.getVecter3(), end.getVecter3(), Color.red);
+    }
+}
+
+public class Room
+{
+    private int room_no_ = 0;
+    private Transform room_tr_;
+    private Vector2 room_offset_;
+    private Vector2 room_size_;
+
+    public Vector2 room_offset { get => room_offset_; }
+    public Vector2 room_size { get => room_size_; }
+
+
+    public Room(int _room_no, Transform _room_tr)
+    {
+        var bc = _room_tr.GetComponent<BoxCollider2D>();
+        room_no_ = _room_no;
+        room_tr_ = _room_tr;
+        room_offset_ = bc.offset;
+        room_size_ = bc.size;
+    }
+
+    public Vertex getVertex()
+    {
+        return new Vertex(room_no_, room_tr_.position.x + room_offset_.x, room_tr_.position.y + room_offset_.y);
+    }
+
+    public Vector2 getVector2()
+    {
+        return new Vector2(room_tr_.position.x + room_offset_.x, room_tr_.position.y + room_offset_.y);
     }
 }
