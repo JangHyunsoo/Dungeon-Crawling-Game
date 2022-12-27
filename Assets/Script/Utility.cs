@@ -21,11 +21,24 @@ public class Utility
         { Direction.RIGHT, Vector2.right }
     };
 
+    public static Dictionary<Direction, Vector2Int> direction_to_vector_int = new Dictionary<Direction, Vector2Int>
+    {
+        { Direction.BOTTOM, Vector2Int.down },
+        { Direction.TOP, Vector2Int.up },
+        { Direction.LEFT, Vector2Int.left },
+        { Direction.RIGHT, Vector2Int.right }
+    };
+
     public static int[] getShuffleArray(int _size)
     {
         int[] shuffle_arr = Enumerable.Range(0, _size).ToArray();
         System.Random random = new System.Random();
         shuffle_arr = shuffle_arr.OrderBy(x => random.Next()).ToArray();
         return shuffle_arr;
+    }
+
+    public static Vector2Int convertVector2ToVector2Int(Vector2 pos)
+    {
+        return new Vector2Int(Mathf.RoundToInt(pos.x), Mathf.RoundToInt(pos.y));
     }
 }

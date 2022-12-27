@@ -10,7 +10,7 @@ public class MapGeneration : MonoBehaviour
 {
     [Header("Room Generation")]
     [SerializeField]
-    private GameObject tile_map_;
+    private GameObject tile_map_prefab_;
     [SerializeField]
     private TileBase tile_base_;
     [SerializeField]
@@ -36,12 +36,12 @@ public class MapGeneration : MonoBehaviour
     private int selecte_room_count_;
 
     private List<Transform> room_tr_list_ = new List<Transform>();
-    private List<Room> room_arr_ = new List<Room>();
+    private List<Room> room_list_ = new List<Room>();
     private List<Vertex> vertex_list_ = new List<Vertex>();
     private Triangle[] triangle_arr_;
     private LineData[] vertex_graph_;
-
-    private List<KeyValuePair<Direction, Vector2>> room_under_vec_ = new List<KeyValuePair<Direction, Vector2>>();
+    [SerializeField]
+    private TileMap tile_map_;
 
     private bool[,] tile_exist_;
 
@@ -60,28 +60,6 @@ public class MapGeneration : MonoBehaviour
         foreach (var item in vertex_graph_)
         {
             item.drawDebug();
-        }
-
-        foreach (var item in room_under_vec_)
-        {
-            switch (item.Key)
-            {
-                case Direction.TOP:
-                    Debug.DrawLine(item.Value, item.Value + Vector2.one * 0.1f, Color.white);
-                    break;
-                case Direction.BOTTOM:
-                    Debug.DrawLine(item.Value, item.Value + Vector2.one * 0.1f, Color.black);
-                    break;
-                case Direction.LEFT:
-                    Debug.DrawLine(item.Value, item.Value + Vector2.one * 0.1f, Color.blue);
-                    break;
-                case Direction.RIGHT:
-                    Debug.DrawLine(item.Value, item.Value + Vector2.one * 0.1f, Color.yellow);
-                    break;
-                default:
-                    break;
-            }
-            
         }
     }
 
@@ -144,14 +122,14 @@ public class MapGeneration : MonoBehaviour
             room.position = new Vector3(corrected_x, corrected_y, 0);
         }
     }
-    
+
     private void generateRoom()
     {
         int width = Random.RandomRange(min_width_, max_width_);
         int height = Random.RandomRange(min_height_, max_height_);
         int random_angle = Random.RandomRange(0, 360);
 
-        var go = GameObject.Instantiate(tile_map_, new Vector3(Mathf.Cos(random_angle), Mathf.Sin(random_angle), 0), Quaternion.identity);
+        var go = GameObject.Instantiate(tile_map_prefab_, new Vector3(Mathf.Cos(random_angle), Mathf.Sin(random_angle), 0), Quaternion.identity);
         var col = go.GetComponent<BoxCollider2D>();
         var tile_map = go.GetComponent<Tilemap>();
         col.size = new Vector2(width * 0.32f, height * 0.32f);
@@ -222,7 +200,7 @@ public class MapGeneration : MonoBehaviour
         for (int i = 0; i < room_tr_list_.Count; i++)
         {
             var bc = room_tr_list_[i].GetComponent<BoxCollider2D>();
-            room_arr_.Add(new Room(i, room_tr_list_[i]));
+            room_list_.Add(new Room(i, room_tr_list_[i]));
             vertex_list_.Add(new Vertex(i, room_tr_list_[i].position.x + bc.offset.x, room_tr_list_[i].position.y + bc.offset.y));
         }
     }
@@ -234,7 +212,7 @@ public class MapGeneration : MonoBehaviour
         Combination(result, new List<Vertex>(), 3, 0);
 
         triangle_arr_ = result.ToArray();
-    } 
+    }
 
     private void Combination(List<Triangle> result, List<Vertex> comb, int r, int depth)
     {
@@ -359,7 +337,9 @@ public class MapGeneration : MonoBehaviour
 
         vertex_graph_ = result.ToArray();
     }
-    
+
+    /***********************************************************************************************/
+
     private Vector2Int getTilePos(Vector2 _real_pos)
     {
         return new Vector2Int(Mathf.RoundToInt((_real_pos.x - 0.16f) / 0.32f), Mathf.RoundToInt((_real_pos.y - 0.16f) / 0.32f));
@@ -370,11 +350,59 @@ public class MapGeneration : MonoBehaviour
         return new Vector2(_tile_pos.x * 0.32f + 0.16f, _tile_pos.y * 0.32f + 0.16f);
     }
 
-    private Vector2 getIncludeTilePos(Direction _dir ,Vector2 _pos)
+    private Vector2 getRealPos(int x, int y)
+    {
+        return new Vector2(x * 0.32f + 0.16f, y * 0.32f + 0.16f);
+    }
+
+    private Vector2 getIncludeTilePos(Direction _dir, Vector2 _pos)
     {
         var correct_vec = _pos + Utility.direction_to_vector[_dir] * 0.01f;
         var temp = new Vector2Int(Mathf.RoundToInt((correct_vec.x - 0.16f) / 0.32f), Mathf.RoundToInt((correct_vec.y - 0.16f) / 0.32f));
         return getRealPos(temp);
+    }
+
+    private void setupTileArray()
+    {
+        float map_min_x = float.MaxValue;
+        float map_min_y = float.MaxValue;
+        float map_max_x = float.MinValue;
+        float map_max_y = float.MinValue;
+
+        foreach (var room in room_list_)
+        {
+            map_min_x = Mathf.Min(map_min_x, room.position.x);
+            map_min_y = Mathf.Min(map_min_y, room.position.y);
+
+            map_max_x = Mathf.Max(map_max_x, room.position.x + room.room_size.x);
+            map_max_y = Mathf.Max(map_max_y, room.position.y + room.room_size.y);
+        }
+
+        int world_width = Mathf.RoundToInt((map_max_x - map_min_x) / 0.32f);
+        int world_height = Mathf.RoundToInt((map_max_y - map_min_y) / 0.32f);
+        Vector2Int world_tile_origin = new Vector2Int(Mathf.RoundToInt(map_min_x / 0.32f - 0.16f) , Mathf.RoundToInt(map_min_y / 0.32f - 0.16f));
+
+        tile_map_.setWorldPos(world_width, world_height, world_tile_origin);
+
+        foreach (var room in room_list_)
+        {
+
+            for (int x = 0; x < Mathf.RoundToInt(room.room_size.x / 0.32f); x++)
+            {
+                for (int y = 0; y < Mathf.RoundToInt(room.room_size.y / 0.32f); y++)
+                {
+                    Vector2Int curr_pos = new Vector2Int(
+                        Mathf.RoundToInt((room.position.x) / 0.32f + x),
+                        Mathf.RoundToInt((room.position.y) / 0.32f + y));
+                    tile_map_.setTileByArrayPos(curr_pos, 1);
+                }
+            }
+        }
+
+        foreach (var room in room_tr_list_)
+        {
+            Destroy(room.gameObject);
+        }
     }
 
     private void linkRooms()
@@ -387,11 +415,11 @@ public class MapGeneration : MonoBehaviour
 
     private void linkRoom(LineData _line)
     {
-        Room start_room = room_arr_[_line.start.no];
-        Room end_room = room_arr_[_line.end.no];
+        Room start_room = room_list_[_line.start.no];
+        Room end_room = room_list_[_line.end.no];
         Vector3 start_room_pos = _line.start.getVecter3();
         Vector3 end_room_pos = _line.end.getVecter3();
-        
+
         // start pos
         Vector3 dir = end_room_pos - start_room_pos;
         float dir_angle = Mathf.Atan2(dir.y, dir.x);
@@ -411,71 +439,69 @@ public class MapGeneration : MonoBehaviour
     {
         var dir = end.Value - start.Value;
         var dir_int = getTilePos(end.Value) - getTilePos(start.Value);
-        
 
-        if((start.Key == Direction.LEFT && end.Key == Direction.RIGHT) || (start.Key == Direction.RIGHT && end.Key == Direction.LEFT))
+
+        if ((start.Key == Direction.LEFT && end.Key == Direction.RIGHT) || (start.Key == Direction.RIGHT && end.Key == Direction.LEFT))
         {
             int curr_x = 0;
             int incr_x = dir_int.x > 0 ? 1 : -1;
+            int curr_y = 0;
+            int incr_y = dir_int.y > 0 ? 1 : -1;
             while (true)
             {
-                if((curr_x > dir_int.x / 2 && incr_x < 0) || (curr_x < dir_int.x / 2 && incr_x > 0))
+                tile_map_.setTileByWorldPos(start.Value + new Vector2(curr_x, curr_y) * 0.32f, 1);
+
+                if (curr_x == dir_int.x) break;
+
+                if (curr_x == dir_int.x / 2)
                 {
-                    GameObject.Instantiate(road_tile_, new Vector2(start.Value.x + curr_x * 0.32f, start.Value.y), Quaternion.identity);
-                }
-                else if(curr_x == dir_int.x / 2)
-                {
-                    int curr_y = 0;
-                    int incr_y = dir_int.y > 0 ? 1 : -1;
-                    while (true)
+                    if(curr_y == dir_int.y)
                     {
-                        GameObject.Instantiate(road_tile_, new Vector2(start.Value.x + curr_x * 0.32f, start.Value.y + curr_y * 0.32f), Quaternion.identity);
-                        if (curr_y == dir_int.y) break;
+                        curr_x += incr_x;
+                    }
+                    else
+                    {
                         curr_y += incr_y;
                     }
                 }
                 else
                 {
-                    GameObject.Instantiate(road_tile_, new Vector2(start.Value.x + curr_x * 0.32f, end.Value.y), Quaternion.identity);
+                    curr_x += incr_x;
                 }
-
-                if (curr_x == dir_int.x) break;
-                curr_x += incr_x;
             }
         }
         else if ((start.Key == Direction.BOTTOM && end.Key == Direction.TOP) || (start.Key == Direction.TOP && end.Key == Direction.BOTTOM))
         {
+            int curr_x = 0;
+            int incr_x = dir_int.x > 0 ? 1 : -1;
             int curr_y = 0;
             int incr_y = dir_int.y > 0 ? 1 : -1;
             while (true)
             {
-                if ((curr_y > dir_int.y / 2 && incr_y < 0) || (curr_y < dir_int.y / 2 && incr_y > 0))
+                tile_map_.setTileByWorldPos(start.Value + new Vector2(curr_x, curr_y) * 0.32f, 1);
+
+                if (curr_y == dir_int.y) break;
+
+                if (curr_y == dir_int.y / 2)
                 {
-                    GameObject.Instantiate(road_tile_, new Vector2(start.Value.x, start.Value.y + curr_y * 0.32f), Quaternion.identity);
-                }
-                else if (curr_y == dir_int.y / 2)
-                {
-                    int curr_x = 0;
-                    int incr_x = dir_int.x > 0 ? 1 : -1;
-                    while (true)
+                    if (curr_x == dir_int.x)
                     {
-                        GameObject.Instantiate(road_tile_, new Vector2(start.Value.x + curr_x * 0.32f, start.Value.y + curr_y * 0.32f), Quaternion.identity);
-                        if (curr_x == dir_int.x) break;
+                        curr_y += incr_y;
+                    }
+                    else
+                    {
                         curr_x += incr_x;
                     }
                 }
                 else
                 {
-                    GameObject.Instantiate(road_tile_, new Vector2(end.Value.x, start.Value.y + curr_y * 0.32f), Quaternion.identity);
+                    curr_y += incr_y;
                 }
-
-                if (curr_y == dir_int.y) break;
-                curr_y += incr_y;
             }
         }
         else
         {
-            if(start.Key == Direction.BOTTOM || start.Key == Direction.TOP)
+            if (start.Key == Direction.BOTTOM || start.Key == Direction.TOP)
             {
                 createRoad(start.Key, start.Value, Mathf.Abs(dir_int.y));
             }
@@ -498,7 +524,7 @@ public class MapGeneration : MonoBehaviour
     {
         for (int i = 0; i < _length; i++)
         {
-            GameObject.Instantiate(road_tile_, _pos + Utility.direction_to_vector[_direction] * i * 0.32f, Quaternion.identity);
+            tile_map_.setTileByWorldPos(_pos / 0.32f + Utility.direction_to_vector[_direction] * i * 0.32f, 1);
         }
     }
 
@@ -509,15 +535,15 @@ public class MapGeneration : MonoBehaviour
 
         if (angle < 0) angle += 2 * Mathf.PI;
 
-        if ((angle < lr_side && angle >= 0) || (2 * Mathf.PI - lr_side <= angle && angle <= 2 * Mathf.PI))
+        if ((angle <= lr_side && angle >= 0) || (2 * Mathf.PI - lr_side <= angle && angle <= 2 * Mathf.PI))
         {
             return Direction.RIGHT;
         }
-        else if (angle >= lr_side && angle < lr_side + 2 * tb_side)
+        else if (angle >= lr_side && angle <= lr_side + 2 * tb_side)
         {
             return Direction.TOP;
         }
-        else if (angle >= lr_side + 2 * tb_side && angle < 3 * lr_side + 2 * tb_side)
+        else if (angle >= lr_side + 2 * tb_side && angle <= 3 * lr_side + 2 * tb_side)
         {
             return Direction.LEFT;
         }
@@ -566,20 +592,7 @@ public class MapGeneration : MonoBehaviour
 
         return new KeyValuePair<Direction, Vector2>(dir, pos);
     }
-
-    private void setupTileArray()
-    {
-        int map_min_x = int.MinValue;
-        int map_min_y = int.MinValue;
-        int map_max_x = int.MaxValue;
-        int map_max_y = int.MaxValue;
-
-        
-
-        
-    }
 }
-
 
 public class Vertex
 {
@@ -710,10 +723,11 @@ public class LineData
 public class Room
 {
     private int room_no_ = 0;
-    private Transform room_tr_;
+    private Vector3 room_pos_;
     private Vector2 room_offset_;
     private Vector2 room_size_;
 
+    public Vector3 position { get => room_pos_; }
     public Vector2 room_offset { get => room_offset_; }
     public Vector2 room_size { get => room_size_; }
 
@@ -722,18 +736,18 @@ public class Room
     {
         var bc = _room_tr.GetComponent<BoxCollider2D>();
         room_no_ = _room_no;
-        room_tr_ = _room_tr;
+        room_pos_ = _room_tr.position;
         room_offset_ = bc.offset;
         room_size_ = bc.size;
     }
 
     public Vertex getVertex()
     {
-        return new Vertex(room_no_, room_tr_.position.x + room_offset_.x, room_tr_.position.y + room_offset_.y);
+        return new Vertex(room_no_, room_pos_.x + room_offset_.x, room_pos_.y + room_offset_.y);
     }
 
     public Vector2 getVector2()
     {
-        return new Vector2(room_tr_.position.x + room_offset_.x, room_tr_.position.y + room_offset_.y);
+        return new Vector2(room_pos_.x + room_offset_.x, room_pos_.y + room_offset_.y);
     }
 }
