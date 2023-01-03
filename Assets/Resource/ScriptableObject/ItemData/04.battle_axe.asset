@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c25df3ccdb5d46e448bdc0bab9f2a608, type: 3}
+  m_Name: 04.battle_axe
+  m_EditorClassIdentifier: 
+  item_name_: "\uC804\uD22C \uB3C4\uB07C"
+  index_no_: 4
+  item_type_: 0
+  temp_color_: {r: 1, g: 0.7221767, b: 0.4009434, a: 0}
+  weapon_type_: 1
+  base_damage_: 6
+  base_speed_: 5
+  base_accuracy_: 4
