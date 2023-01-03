@@ -7,20 +7,27 @@ public class TileDataBase : Singleton<TileDataBase>
     [SerializeField]
     private GameObject tile_prefab_;
     [SerializeField]
-    private Sprite[] tile_sprite_arr_;
-    [SerializeField]
-    private Transform tile_holder_;
+    private TileData[] tile_data_arr_;
 
-    public Sprite getSprite(int _idx)
+    public void init()
     {
-        return tile_sprite_arr_[_idx];
+        System.Array.Sort(tile_data_arr_, delegate(TileData one, TileData other)
+        {
+            if (one.tile_no > other.tile_no) return 1;
+            else if (one.tile_no == other.tile_no) return 0;
+            else return -1;
+        });
+    }
+
+    public TileData getTileData(int _idx)
+    {
+        return tile_data_arr_[_idx];
     }
 
     public GameObject createTile(Vector2 _pos, int _idx)
     {
         var tile = GameObject.Instantiate(tile_prefab_, _pos, Quaternion.identity);
         tile.GetComponent<Tile>().setType(_idx);
-        //tile.transform.SetParent(this.gameObject.transform);
         return tile;
     }
 

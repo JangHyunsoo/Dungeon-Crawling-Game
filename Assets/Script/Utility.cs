@@ -29,6 +29,14 @@ public class Utility
         { Direction.RIGHT, Vector2Int.right }
     };
 
+    public static Vector2Int[] int_to_vector_int = new Vector2Int[]
+    {
+        Vector2Int.down,
+        Vector2Int.up,
+        Vector2Int.left,
+        Vector2Int.right
+    };
+
     public static int[] getShuffleArray(int _size)
     {
         int[] shuffle_arr = Enumerable.Range(0, _size).ToArray();
