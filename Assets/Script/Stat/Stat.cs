@@ -4,7 +4,5 @@ using UnityEngine;
 
 public abstract class Stat
 {
-    public virtual void init() { }
-
     public virtual float getValue() { return 0f; }
 }

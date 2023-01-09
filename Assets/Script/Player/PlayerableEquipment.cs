@@ -4,28 +4,47 @@ using UnityEngine;
 
 public class PlayerableEquipment
 {
-    private int weapon_index_;
-    private int armor_index_;
-    private int[] ring_index_arr_ = new int[2];
-    private int neckless_index_;
+    private Weapon weapon_ = null;
+    public Weapon weapon { get => weapon_; }
+    private Armor armor_;
+    public Armor armor { get => armor_; }
+    private Item[] ring_arr_ = new Item[2];
     
-    public void equipWeapon(int _inventory_num)
+    public void equipWeapon(Item _equiped_weapon)
     {
-        weapon_index_ = _inventory_num;
+        if(weapon_ != null)
+        {
+            foreach (var addition_type in weapon_.addition_stat_list)
+            {
+                PlayerManager.instance.playerable_stat.addValue(addition_type.stat_type, -addition_type.value);
+            }
+        }
+
+        weapon_ = (Weapon)_equiped_weapon;
+
+        foreach (var addition_type in weapon_.addition_stat_list)
+        {
+            PlayerManager.instance.playerable_stat.addValue(addition_type.stat_type, addition_type.value);
+        }
     }
 
-    public void equipArmor(int _inventory_num)
+    public void equipArmor(Item _equiped_armor)
     {
-        armor_index_ = _inventory_num;
+        if (armor_ != null)
+        {
+            foreach (var addition_type in armor_.addition_stat_list)
+            {
+                PlayerManager.instance.playerable_stat.addValue(addition_type.stat_type, -addition_type.value);
+            }
+        }
+
+        armor_ = (Armor)_equiped_armor;
+
+        foreach (var addition_type in armor_.addition_stat_list)
+        {
+            PlayerManager.instance.playerable_stat.addValue(addition_type.stat_type, addition_type.value);
+        }
+
     }
     
-    public void equipRing(int _inventory_num, int _index)
-    {
-        ring_index_arr_[_index] = _inventory_num;
-    }
-
-    public void equipNeckless(int _inventory_num)
-    {
-        neckless_index_ = _inventory_num;
-    }
 }

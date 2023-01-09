@@ -10,5 +10,5 @@ public class EntityData : ScriptableObject
 
     [SerializeField]
     private int index_no_;
-    public int index_no;
+    public int index_no { get => index_no_; }
 }

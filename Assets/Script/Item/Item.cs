@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Item
 {
-    private ItemData item_data_;
+    protected ItemData item_data_;
     public ItemData item_data { get => item_data_; }
 
     private int amount_;

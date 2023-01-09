@@ -4,24 +4,24 @@ using UnityEngine;
 
 public class BaseStat : Stat
 {
-    private float base_stat_;
-    private float addition_stat_;
-    private float level_per_stat_;
+    protected float base_stat_;
+    protected float addition_stat_;
+    protected float level_per_stat_;
 
-    public BaseStat()
+    protected BaseStat()
     {
-        base_stat_ = 0f;
         addition_stat_ = 0f;
         level_per_stat_ = 0f;
-    }
-
-    public override void init()
-    {
     }
 
     public override float getValue()
     {
         return base_stat_ + addition_stat_;
+    }
+
+    public void setAdditionValue(float _value)
+    {
+        addition_stat_ += _value;
     }
 }
 

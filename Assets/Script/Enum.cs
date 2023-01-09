@@ -7,7 +7,6 @@ public enum ItemType
     WEAPON,
     ARMOR,
     RING,
-    NECKLESS,
     POTION,
     SCROLL,
     OTHER

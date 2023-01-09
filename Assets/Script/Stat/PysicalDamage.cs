@@ -6,7 +6,8 @@ public class PysicalDamage : Stat
 {
     public override float getValue()
     {
-        // PlayerableEquipment에서 값 불러올 필요 있어보임ㅋㅋㅋ
-        return PlayerManager.instance.playerable_stat.getValue(StatType.STRENGTH);
+        var player_stat = PlayerManager.instance.playerable_stat;
+        var weapon = PlayerManager.instance.playerable_inventory.playerable_equipment.weapon;
+        return player_stat.getValue(StatType.STRENGTH) + ((WeaponData)weapon.item_data).base_damage + weapon.enhanced_value;
     }
 }

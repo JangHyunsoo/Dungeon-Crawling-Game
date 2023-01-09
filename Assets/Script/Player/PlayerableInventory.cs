@@ -16,6 +16,8 @@ public class PlayerableInventory
         playerable_equipment_ = new PlayerableEquipment();
 
         // playerable 데이터의 의한 초기 아이템 초기화
+        item_arr_[0] = new Weapon(ItemDatabase.instance.getItemData(ItemType.WEAPON, 0));
+        playerable_equipment_.equipWeapon(item_arr_[0]);
     }
 
     public Item getItemToIndexNum(int _index)

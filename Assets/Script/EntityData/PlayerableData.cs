@@ -35,5 +35,5 @@ public class PlayerableData : EntityData
 
     [SerializeField]
     private int base_armor_value_;
-    public int bae_armor_value;
+    public int base_armor_value { get => base_armor_value_; }
 }

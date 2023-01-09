@@ -6,8 +6,7 @@ public class GameManager : Singleton<GameManager>
 {
     private bool start_game_ = false;
     public bool start_game { get => start_game_; }
-
-    // Start is called before the first frame update
+    
     void Start()
     {
         initDataBase();

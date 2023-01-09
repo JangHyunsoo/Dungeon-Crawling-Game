@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Weapon : EquipItem
+public class Armor : EquipItem
 {
-    public Weapon(ItemData _equip_item_data) : base(_equip_item_data) { }
+    public Armor(ItemData _equip_item_data) : base(_equip_item_data) { }
 
     // 네이밍 수정 요망 > 모호한 이름 
     protected override bool setIncludeAddition()
@@ -17,15 +17,14 @@ public class Weapon : EquipItem
 
     protected override void setRandomStat()
     {
-        addition_stat_list_ = new List<StatValuePair>();
-        enhanced_value_ = UnityEngine.Random.RandomRange(0, 3);
         int random_stat_size = UnityEngine.Random.RandomRange(1, 4);
+
         var random_stat_arr = ItemDatabase.instance.getRandomStatTypeArr(random_stat_size);
 
-       for (int i = 0; i < random_stat_size; i++)
-       {
-           random_stat_arr[i].value = UnityEngine.Random.RandomRange(-random_stat_arr[i].value, random_stat_arr[i].value);
-           addition_stat_list_.Add(random_stat_arr[i]);
-       }
+        for (int i = 0; i < random_stat_size; i++)
+        {
+            random_stat_arr[i].value = UnityEngine.Random.RandomRange(-random_stat_arr[i].value, random_stat_arr[i].value);
+            addition_stat_list_.Add(random_stat_arr[i]);
+        }
     }
 }
