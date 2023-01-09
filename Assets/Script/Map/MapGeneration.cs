@@ -40,6 +40,8 @@ public class MapGeneration : MonoBehaviour
     private Triangle[] triangle_arr_;
     private LineData[] vertex_graph_;
 
+    private List<KeyValuePair<Direction, Vector2>> line_end_pos = new List<KeyValuePair<Direction, Vector2>>();
+
     private bool[,] tile_exist_;
 
     private bool is_map_init_ = false;
@@ -56,11 +58,16 @@ public class MapGeneration : MonoBehaviour
         {
             item.drawDebug();
         }
+
+        foreach (var pos in line_end_pos)
+        {
+            Debug.DrawLine(pos.Value, pos.Value + Vector2.one * 0.1f, Color.blue);
+        }
     }
 
     public IEnumerator gernationMap()
     {
-        yield return StartCoroutine(gernationMapCoroutine(10f));
+        yield return StartCoroutine(gernationMapCoroutine(5f));
     }
 
     private void generationRoom(int _room_size)
@@ -147,7 +154,8 @@ public class MapGeneration : MonoBehaviour
                 selected_room_list.Add(cur_room_tr_);
                 selected_room_count++;
                 var box_collider = cur_room_tr_.GetComponent<BoxCollider2D>();
-                box_collider.enabled = false;
+                // box_collider.enabled = false;
+                cur_room_tr_.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
                 var col_size = box_collider.size + Vector2.one * 0.65f;
                 var room_pivot = cur_room_tr_.transform.position + new Vector3(box_collider.offset.x, box_collider.offset.y);
 
@@ -328,8 +336,6 @@ public class MapGeneration : MonoBehaviour
         vertex_graph_ = result.ToArray();
     }
 
-    /***********************************************************************************************/
-
     private Vector2Int getTilePos(Vector2 _real_pos)
     {
         return new Vector2Int(Mathf.RoundToInt((_real_pos.x - 0.16f) / 0.32f), Mathf.RoundToInt((_real_pos.y - 0.16f) / 0.32f));
@@ -371,29 +377,22 @@ public class MapGeneration : MonoBehaviour
             map_max_y = Mathf.Max(map_max_y, room.position.y + room.room_size.y);
         }
 
-        for (int i = 0; i < room_count; i++)
-        {
-            Room room = MapManager.instance.tile_map.getRoom(i);
-            map_min_x = Mathf.Min(map_min_x, room.position.x);
-            map_min_y = Mathf.Min(map_min_y, room.position.y);
-
-            map_max_x = Mathf.Max(map_max_x, room.position.x + room.room_size.x);
-            map_max_y = Mathf.Max(map_max_y, room.position.y + room.room_size.y);
-        }
-
         int world_width = Mathf.RoundToInt((map_max_x - map_min_x) / 0.32f);
         int world_height = Mathf.RoundToInt((map_max_y - map_min_y) / 0.32f);
-        Vector2Int world_tile_origin = new Vector2Int(Mathf.RoundToInt(map_min_x / 0.32f - 0.16f) , Mathf.RoundToInt(map_min_y / 0.32f - 0.16f));
+        Vector2Int world_tile_origin = new Vector2Int(Mathf.RoundToInt((map_min_x) / 0.32f), Mathf.RoundToInt((map_min_y) / 0.32f));
+
 
         MapManager.instance.tile_map.setWorldPos(world_width, world_height, world_tile_origin);
 
         for (int i = 0; i < room_count; i++)
         {
             Room room = MapManager.instance.tile_map.getRoom(i);
+            int x_size = Mathf.RoundToInt(room.room_size.x / 0.32f);
+            int y_size = Mathf.RoundToInt(room.room_size.y / 0.32f);
 
-            for (int x = 0; x < Mathf.RoundToInt(room.room_size.x / 0.32f); x++)
+            for (int x = 0; x < x_size; x++)
             {
-                for (int y = 0; y < Mathf.RoundToInt(room.room_size.y / 0.32f); y++)
+                for (int y = 0; y < y_size; y++)
                 {
                     Vector2Int curr_pos = new Vector2Int(
                         Mathf.RoundToInt((room.position.x) / 0.32f + x),
@@ -429,12 +428,14 @@ public class MapGeneration : MonoBehaviour
         float dir_angle = Mathf.Atan2(dir.y, dir.x);
 
         var start_door = getRoadStartInfo(start_room, dir_angle);
+        line_end_pos.Add(start_door);
 
         //end pos
         dir = start_room_pos - end_room_pos;
         dir_angle = Mathf.Atan2(dir.y, dir.x);
 
         var end_door = getRoadStartInfo(end_room, dir_angle);
+        line_end_pos.Add(end_door);
 
         connectVertex(start_door, end_door);
     }
@@ -443,7 +444,6 @@ public class MapGeneration : MonoBehaviour
     {
         var dir = end.Value - start.Value;
         var dir_int = getTilePos(end.Value) - getTilePos(start.Value);
-
 
         if ((start.Key == Direction.LEFT && end.Key == Direction.RIGHT) || (start.Key == Direction.RIGHT && end.Key == Direction.LEFT))
         {

@@ -5,9 +5,7 @@ using UnityEngine;
 public class TileMap : MonoBehaviour
 {
     private float tile_size_ = 0.32f;
-    [SerializeField]
     private int world_width_;
-    [SerializeField]
     private int world_height_;
     private Room[] room_arr_;
     private Vector2Int world_tile_min_pos_;
@@ -26,6 +24,11 @@ public class TileMap : MonoBehaviour
     public int getRoomLength()
     {
         return room_arr_.Length;
+    }
+
+    public bool isOnMap(Vector2Int pos)
+    {
+        return pos.x >= world_tile_min_pos_.x && pos.x < world_width_ + world_tile_min_pos_.x && pos.y >= world_tile_min_pos_.y && pos.y < world_height_ + world_tile_min_pos_.y;
     }
 
     public Tile getTileByTilePos(Vector2Int pos)
@@ -51,6 +54,7 @@ public class TileMap : MonoBehaviour
             for (int j = 0; j < world_height_; j++)
             {
                 var tile = TileDataBase.instance.createTile(convertArrayPos2RealPos(i, j), 0);
+                tile.name = (new Vector2Int(i, j) + world_tile_min_pos_).ToString();
                 tile.transform.SetParent(transform);
                 world_tile_type_arr_[i, j] = tile.GetComponent<Tile>();
             }
@@ -76,12 +80,12 @@ public class TileMap : MonoBehaviour
 
     public Vector2 convertArrayPos2RealPos(Vector2Int pos)
     {
-        return new Vector2((pos.x + world_tile_min_pos_.x) * tile_size_ - tile_size_ / 2, (pos.y + world_tile_min_pos_.y) * tile_size_ - tile_size_ / 2);
+        return new Vector2((pos.x + world_tile_min_pos_.x) * tile_size_ + tile_size_ / 2, (pos.y + world_tile_min_pos_.y) * tile_size_ + tile_size_ / 2);
     }
 
     public Vector2 convertArrayPos2RealPos(int x, int y)
     {
-        return new Vector2((x + world_tile_min_pos_.x) * tile_size_ - tile_size_ / 2, (y + world_tile_min_pos_.y) * tile_size_ - tile_size_ / 2);
+        return new Vector2((x + world_tile_min_pos_.x) * tile_size_ + tile_size_ / 2, (y + world_tile_min_pos_.y) * tile_size_ + tile_size_ / 2);
     }
 
     public Vector2Int convertTilePos2ArrayPos(int x, int y)
@@ -96,7 +100,7 @@ public class TileMap : MonoBehaviour
 
     public Vector2Int convertWorldPos2TilePos(Vector2 pos)
     {
-        return new Vector2Int(Mathf.RoundToInt(pos.x / tile_size_ - tile_size_ / 2), Mathf.RoundToInt(pos.y / tile_size_ - tile_size_ / 2));
+        return new Vector2Int(Mathf.RoundToInt((pos.x - tile_size_ / 2) / tile_size_), Mathf.RoundToInt((pos.y - tile_size_ / 2) / tile_size_));
     }
 
     public Vector2Int convertWorldPos2ArrayPos(Vector2 pos)
@@ -104,9 +108,9 @@ public class TileMap : MonoBehaviour
         return convertTilePos2ArrayPos(convertWorldPos2TilePos(pos));
     }
 
-    private Vector2Int getIncludeTilePos(Vector2 _pos)
+    public Vector2Int getIncludeTilePos(Vector2 pos)
     {
-        return new Vector2Int(Mathf.RoundToInt((_pos.x - tile_size_ / 2) / tile_size_), Mathf.RoundToInt((_pos.y - tile_size_ / 2) / tile_size_));
+        return new Vector2Int(Mathf.RoundToInt((pos.x - tile_size_ / 2) / tile_size_), Mathf.RoundToInt((pos.y - tile_size_ / 2) / tile_size_));
     }
 
     public Vector2Int getRandomRoomTilePos()
