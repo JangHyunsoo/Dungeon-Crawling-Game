@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: 02.Water
   m_EditorClassIdentifier: 
   tile_no_: 2
-  tile_sprite_: {fileID: 21300000, guid: 0b1b77b33ec633f45b7b3abb12dafe8d, type: 3}
+  tile_sprite_: {fileID: 21300000, guid: 36728d1d9e901464b89ad73d489d448a, type: 3}
   can_under_: 1
+  is_wall_: 0

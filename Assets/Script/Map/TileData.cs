@@ -16,4 +16,8 @@ public class TileData : ScriptableObject
     [SerializeField]
     private bool can_under_ = true;
     public bool can_under { get => can_under_; }
+
+    [SerializeField]
+    private bool is_wall_;
+    public bool is_wall { get => is_wall_; }
 }
