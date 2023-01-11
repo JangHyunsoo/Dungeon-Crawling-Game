@@ -61,4 +61,9 @@ public class Utility
     {
         return new Vector2Int(Mathf.RoundToInt(pos.x), Mathf.RoundToInt(pos.y));
     }
+
+    public static AptitudeType convertAptitudeTypeToWeaponType(WeaponType _weapon_type)
+    {
+        return (AptitudeType)(int)_weapon_type;
+    }
 }

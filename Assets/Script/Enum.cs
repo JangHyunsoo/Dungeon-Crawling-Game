@@ -14,10 +14,21 @@ public enum ItemType
 
 public enum WeaponType
 {
-    SWORD,
-    AXE,
-    SPEAR,
-    BLUNT
+    SWORD = 0,
+    AXE = 1,
+    SPEAR = 2,
+    BLUNT = 3
+}
+
+public enum AptitudeType
+{
+    SWORD = 0,
+    AXE = 1,
+    SPEAR = 2,
+    BLUNT = 3,
+
+    FIRE_MAGIC,
+    ICE_MAGIC
 }
 
 public enum StatType 

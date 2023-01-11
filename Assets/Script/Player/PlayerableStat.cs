@@ -4,12 +4,10 @@ using UnityEngine;
 
 public class PlayerableStat
 {
-    private Dictionary<StatType, Stat> stat_dic_;
+    private Dictionary<StatType, Stat> stat_dic_ = new Dictionary<StatType, Stat>();
 
     public void init()
     {
-        stat_dic_ = new Dictionary<StatType, Stat>();
-
         stat_dic_.Add(StatType.STRENGTH, new Strenght());
         stat_dic_.Add(StatType.INTELLIGENT, new Intelligent());
         stat_dic_.Add(StatType.DEXTERITY, new Dexterity());

@@ -18,7 +18,20 @@ MonoBehaviour:
   base_hp_regen_: 1
   base_mp_: 100
   base_mp_regen_: 1
-  base_strength_: 10
-  base_intelligent_: 10
-  base_dexterity_: 10
-  base_armor_value_: 10
+  base_strength_: 5
+  base_intelligent_: 5
+  base_dexterity_: 5
+  base_armor_value_: 5
+  base_aptitude_value_arr_:
+  - aptitude_type: 0
+    value: 0
+  - aptitude_type: 1
+    value: 0
+  - aptitude_type: 2
+    value: 0
+  - aptitude_type: 3
+    value: 0
+  - aptitude_type: 4
+    value: 0
+  - aptitude_type: 5
+    value: 0

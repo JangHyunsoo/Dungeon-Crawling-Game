@@ -46,5 +46,11 @@ public class PlayerableEquipment
         }
 
     }
+
+
+    public Weapon getWeapon()
+    {
+        return weapon_;
+    }
     
 }

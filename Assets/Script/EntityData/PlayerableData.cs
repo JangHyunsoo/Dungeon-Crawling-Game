@@ -36,4 +36,15 @@ public class PlayerableData : EntityData
     [SerializeField]
     private int base_armor_value_;
     public int base_armor_value { get => base_armor_value_; }
+
+    [SerializeField]
+    private AptitudePair[] base_aptitude_value_arr_;
+    public AptitudePair[] base_aptitude_value_arr { get => base_aptitude_value_arr_; }
+}
+
+[System.Serializable]
+public struct AptitudePair
+{
+    public AptitudeType aptitude_type;
+    public int value;
 }

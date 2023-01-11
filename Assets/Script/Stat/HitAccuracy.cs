@@ -6,7 +6,6 @@ public class HitAccuracy : Stat
 {
     public override float getValue()
     {
-        return 0f;
-        //return PlayerManager.instance.playerable_stat.getValue()
+        return 1f;
     }
 }
