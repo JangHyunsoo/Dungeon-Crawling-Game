@@ -7,6 +7,9 @@ public class Tile : MonoBehaviour
     private int tile_type_;
     private TileData tile_data_;
     private PathData path_data_ = new PathData();
+    private EnemyMove enemy_;
+    private PlayerMove player_;
+    private List<Item> item_list_ = new List<Item>();
     private bool is_empty_ = true;
 
     public int tile_type { get => tile_type_; }
@@ -14,7 +17,7 @@ public class Tile : MonoBehaviour
     public TileData tile_data { get => tile_data_; }
     public PathData path_data { get => path_data_; }
     public bool is_empty { get => is_empty_; }
-    public bool workable { get => tile_data_.walkable && is_empty_; }
+    public bool walkable { get => tile_data_.walkable && is_empty_; }
 
     [SerializeField]
     private SpriteRenderer cloud_rd_;
@@ -28,7 +31,7 @@ public class Tile : MonoBehaviour
         tile_type_ = _tile_type;
         tile_data_ = TileDataBase.instance.getTileData(_tile_type);
         GetComponent<SpriteRenderer>().sprite = tile_data_.tile_sprite;
-        cloud_rd_.color = Color.clear;
+        cloud_rd_.color = Color.white;
     }
 
     public void updateVisible(bool can_view)

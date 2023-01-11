@@ -24,10 +24,10 @@ public class PlayerableAptitude
 
         aptitude.setCurrentExp(_value + aptitude.cur_level);
 
-        if(aptitude.cur_level >= aptitude.max_experience)
+        if(aptitude.cur_experience >= aptitude.max_experience)
         {
             aptitude.increaseLevel();
-            aptitude.setCurrentExp(0f);
+            aptitude.setCurrentExp(aptitude.cur_experience - aptitude.max_experience);
             aptitude.setMaxExp(getRequirementExp(_aptitude_type));
 
             // exception for 'if max level' 
@@ -50,7 +50,7 @@ public struct LevelData
     public float cur_experience;
     public float max_experience;
 
-    public void setCurrentExp(float _value) { cur_experience += _value; }
+    public void setCurrentExp(float _value) { cur_experience = _value; }
     public void setMaxExp(float _value) { max_experience = _value; }
     public void increaseLevel() { cur_level++; }
 }

@@ -31,6 +31,10 @@ public class MapGeneration : MonoBehaviour
     private int max_height_;
 
     [SerializeField]
+    [Range(0, 100f)]
+    private float additional_route_chance_ = 30f;
+
+    [SerializeField]
     private int generation_room_count_;
     [SerializeField]
     private int selecte_room_count_;
@@ -343,16 +347,17 @@ public class MapGeneration : MonoBehaviour
             int s = cur_edge.end.no;
 
             if (findRoot(parent, f) == findRoot(parent, s)){
-                unselected_lines_.Add(cur_edge);
                 continue;
             }
 
             result.Add(cur_edge);
+            vertex_graph_.Remove(cur_edge);
             unionRoot(parent, f, s);
 
             if (result.Count == vertex_list_.Count - 1) break;
         }
 
+        unselected_lines_ = vertex_graph_;
         vertex_graph_ = result;
     }
 
@@ -360,12 +365,11 @@ public class MapGeneration : MonoBehaviour
     {
         foreach (var unselected_line in unselected_lines_)
         {
-            if(Random.RandomRange(0f, 100f) < 20f)
+            if(Random.RandomRange(0f, 100f) < additional_route_chance_)
             {
                 vertex_graph_.Add(unselected_line);
             }
         }
-
     }
 
     private Vector2Int getTilePos(Vector2 _real_pos)
