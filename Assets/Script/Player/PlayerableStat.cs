@@ -36,13 +36,4 @@ public class PlayerableStat
     {
         return stat_dic_[_stat_type].getValue();
     }
-
-    public void debug()
-    {
-        foreach (var item in stat_dic_)
-        {
-            Debug.Log(item.Key.ToString() + " : " + item.Value.getValue().ToString());
-        }
-
-    }
 }

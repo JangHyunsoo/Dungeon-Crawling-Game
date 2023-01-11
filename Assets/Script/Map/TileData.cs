@@ -14,8 +14,8 @@ public class TileData : ScriptableObject
     public Sprite tile_sprite { get => tile_sprite_; }
 
     [SerializeField]
-    private bool can_under_ = true;
-    public bool can_under { get => can_under_; }
+    private bool walkable_ = true;
+    public bool walkable { get => walkable_; }
 
     [SerializeField]
     private bool is_wall_;

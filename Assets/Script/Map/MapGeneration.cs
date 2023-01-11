@@ -38,7 +38,8 @@ public class MapGeneration : MonoBehaviour
     private List<Transform> room_tr_list_ = new List<Transform>();
     private List<Vertex> vertex_list_ = new List<Vertex>();
     private Triangle[] triangle_arr_;
-    private LineData[] vertex_graph_;
+    private List<LineData> vertex_graph_ = new List<LineData>();
+    private List<LineData> unselected_lines_ = new List<LineData>();
 
     private List<KeyValuePair<Direction, Vector2>> line_end_pos = new List<KeyValuePair<Direction, Vector2>>();
 
@@ -55,13 +56,29 @@ public class MapGeneration : MonoBehaviour
         if (!is_map_init_) return;
 
         foreach (var item in vertex_graph_)
-        {
-            item.drawDebug();
+        {            item.drawDebug();
         }
 
         foreach (var pos in line_end_pos)
         {
-            Debug.DrawLine(pos.Value, pos.Value + Vector2.one * 0.1f, Color.blue);
+            switch (pos.Key)
+            {
+                case Direction.TOP:
+                    Debug.DrawLine(pos.Value, pos.Value + Vector2.one * 0.1f, Color.blue);
+                    break;
+                case Direction.BOTTOM:
+                    Debug.DrawLine(pos.Value, pos.Value + Vector2.one * 0.1f, Color.red);
+                    break;
+                case Direction.LEFT:
+                    Debug.DrawLine(pos.Value, pos.Value + Vector2.one * 0.1f, Color.black);
+                    break;
+                case Direction.RIGHT:
+                    Debug.DrawLine(pos.Value, pos.Value + Vector2.one * 0.1f, Color.white);
+                    break;
+                default:
+                    break;
+            }
+            
         }
     }
 
@@ -108,9 +125,9 @@ public class MapGeneration : MonoBehaviour
         setupCheckedTriangle();
         setupGraph();
         calculKruskal();
+        selectRandomRoute();
         setupTileArray();
         linkRooms();
-        selecte_room_count_ = vertex_list_.Count;
         is_map_init_ = true;
     }
 
@@ -291,7 +308,7 @@ public class MapGeneration : MonoBehaviour
             else return 0;
         });
 
-        vertex_graph_ = line_graph_list.ToArray();
+        vertex_graph_ = line_graph_list;
     }
 
     private int findRoot(int[] parent, int x)
@@ -318,22 +335,37 @@ public class MapGeneration : MonoBehaviour
             parent[i] = i;
         }
 
-        for (int i = 0; i < vertex_graph_.Length; i++)
+        for (int i = 0; i < vertex_graph_.Count; i++)
         {
             LineData cur_edge = vertex_graph_[i];
 
             int f = cur_edge.start.no;
             int s = cur_edge.end.no;
 
-            if (findRoot(parent, f) == findRoot(parent, s)) continue;
+            if (findRoot(parent, f) == findRoot(parent, s)){
+                unselected_lines_.Add(cur_edge);
+                continue;
+            }
 
             result.Add(cur_edge);
             unionRoot(parent, f, s);
 
-            if (vertex_graph_.Length == vertex_list_.Count - 1) return;
+            if (result.Count == vertex_list_.Count - 1) break;
         }
 
-        vertex_graph_ = result.ToArray();
+        vertex_graph_ = result;
+    }
+
+    private void selectRandomRoute()
+    {
+        foreach (var unselected_line in unselected_lines_)
+        {
+            if(Random.RandomRange(0f, 100f) < 20f)
+            {
+                vertex_graph_.Add(unselected_line);
+            }
+        }
+
     }
 
     private Vector2Int getTilePos(Vector2 _real_pos)
@@ -377,9 +409,9 @@ public class MapGeneration : MonoBehaviour
             map_max_y = Mathf.Max(map_max_y, room.position.y + room.room_size.y);
         }
 
-        int world_width = Mathf.RoundToInt((map_max_x - map_min_x) / 0.32f);
-        int world_height = Mathf.RoundToInt((map_max_y - map_min_y) / 0.32f);
-        Vector2Int world_tile_origin = new Vector2Int(Mathf.RoundToInt((map_min_x) / 0.32f), Mathf.RoundToInt((map_min_y) / 0.32f));
+        int world_width = Mathf.RoundToInt((map_max_x - map_min_x) / 0.32f) + 10;
+        int world_height = Mathf.RoundToInt((map_max_y - map_min_y) / 0.32f) + 10;
+        Vector2Int world_tile_origin = new Vector2Int(Mathf.RoundToInt((map_min_x) / 0.32f) - 5, Mathf.RoundToInt((map_min_y) / 0.32f) - 5);
 
 
         MapManager.instance.tile_map.setWorldPos(world_width, world_height, world_tile_origin);
@@ -567,25 +599,25 @@ public class MapGeneration : MonoBehaviour
         {
             case Direction.TOP:
                 {
-                    float x = origin_pos.x + (_room.room_size.y / 2) / Mathf.Tan(angle);
+                    float x = origin_pos.x + (_room.room_size.y / 2) / Mathf.Tan(angle) * (1f - 1e-4f);
                     pos = new Vector2(x, origin_pos.y + _room.room_size.y / 2);
                     break;
                 }
             case Direction.BOTTOM:
                 {
-                    float x = origin_pos.x + (_room.room_size.y / 2) / Mathf.Tan(angle) * -1;
+                    float x = origin_pos.x + (_room.room_size.y / 2) / Mathf.Tan(angle) * (1f - 1e-4f) * -1;
                     pos = new Vector2(x, origin_pos.y - _room.room_size.y / 2);
                     break;
                 }
             case Direction.LEFT:
                 {
-                    float y = origin_pos.y + (_room.room_size.x / 2) * Mathf.Tan(angle) * -1;
+                    float y = origin_pos.y + (_room.room_size.x / 2) * Mathf.Tan(angle) * (1f - 1e-4f) * -1;
                     pos = new Vector2(origin_pos.x - _room.room_size.x / 2, y);
                     break;
                 }
             case Direction.RIGHT:
                 {
-                    float y = origin_pos.y + (_room.room_size.x / 2) * Mathf.Tan(angle);
+                    float y = origin_pos.y + (_room.room_size.x / 2) * Mathf.Tan(angle) * (1f - 1e-4f);
                     pos = new Vector2(origin_pos.x + _room.room_size.x / 2, y);
                     break;
                 }

@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerMove : Singleton<PlayerMove>
 {
     private Vector2Int curr_pos_; // tile pos
+    public Vector2Int curr_pos { get => curr_pos_; }
 
     public void Update()
     {
@@ -45,7 +46,7 @@ public class PlayerMove : Singleton<PlayerMove>
         var pos = curr_pos_ + Utility.int_to_vector_int[dir];
         if (MapManager.instance.tile_map.isOnMap(pos))
         {
-            if (MapManager.instance.tile_map.getTileByTilePos(pos).tile_data.can_under)
+            if (MapManager.instance.tile_map.getTileByTilePos(pos).tile_data.walkable)
             {
                 setPositionByTilePos(pos);
             }

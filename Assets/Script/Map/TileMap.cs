@@ -9,7 +9,7 @@ public class TileMap : MonoBehaviour
     private int world_height_;
     private Room[] room_arr_;
     private Vector2Int world_tile_min_pos_;
-    private Tile[,] world_tile_type_arr_;
+    private Tile[,] world_tile_arr_;
 
     public void setRoomArr(List<Room> _room_list)
     {
@@ -31,10 +31,39 @@ public class TileMap : MonoBehaviour
         return pos.x >= world_tile_min_pos_.x && pos.x < world_width_ + world_tile_min_pos_.x && pos.y >= world_tile_min_pos_.y && pos.y < world_height_ + world_tile_min_pos_.y;
     }
 
+    public bool isOnMap(int x, int y)
+    {
+        return x >= world_tile_min_pos_.x && x < world_width_ + world_tile_min_pos_.x && y >= world_tile_min_pos_.y && y < world_height_ + world_tile_min_pos_.y;
+    }
+
+    public List<Tile> getNeighbourTile(Vector2Int pos)
+    {
+        List<Tile> neighbours = new List<Tile>();
+
+        for (int x = -1; x <= 1; x++)
+        {
+            for (int y = -1; y <= 1; y++)
+            {
+                if (x == 0 && y == 0)
+                    continue;
+
+                var cur_pos = new Vector2Int(pos.x + x, pos.y + y);
+
+                if (isOnMap(cur_pos))
+                {
+                    var cur_tile_pos = convertTilePos2ArrayPos(cur_pos);
+                    neighbours.Add(world_tile_arr_[cur_tile_pos.x, cur_tile_pos.y]);
+                }
+            }
+        }
+
+        return neighbours;
+    }
+
     public Tile getTileByTilePos(Vector2Int pos)
     {
         var temp = convertTilePos2ArrayPos(pos);
-        return world_tile_type_arr_[temp.x, temp.y];
+        return world_tile_arr_[temp.x, temp.y];
     }
 
     public Vector2 getRealPosByTilePos(Vector2Int pos)
@@ -47,7 +76,7 @@ public class TileMap : MonoBehaviour
         world_width_ = _world_width;
         world_height_ = _world_height;
         world_tile_min_pos_ = _world_tile_min_pos;
-        world_tile_type_arr_ = new Tile[world_width_, world_height_];
+        world_tile_arr_ = new Tile[world_width_, world_height_];
 
         for (int i = 0; i < world_width_; i++)
         {
@@ -56,7 +85,7 @@ public class TileMap : MonoBehaviour
                 var tile = TileDataBase.instance.createTile(convertArrayPos2RealPos(i, j), 0);
                 tile.name = (new Vector2Int(i, j) + world_tile_min_pos_).ToString();
                 tile.transform.SetParent(transform);
-                world_tile_type_arr_[i, j] = tile.GetComponent<Tile>();
+                world_tile_arr_[i, j] = tile.GetComponent<Tile>();
             }
         }
     }
@@ -64,7 +93,7 @@ public class TileMap : MonoBehaviour
     public void setTileByArrayPos(Vector2Int pos, int _tile_type)
     {
         var temp = convertTilePos2ArrayPos(pos);
-        world_tile_type_arr_[temp.x, temp.y].setType(_tile_type);
+        world_tile_arr_[temp.x, temp.y].setType(_tile_type);
     }
 
     public void setTileByArrayPos(int x, int y, int _tile_type)
@@ -75,7 +104,7 @@ public class TileMap : MonoBehaviour
     public void setTileByWorldPos(Vector2 pos, int _tile_type)
     {
         var temp = convertWorldPos2ArrayPos(pos);
-        world_tile_type_arr_[temp.x, temp.y].setType(_tile_type);
+        world_tile_arr_[temp.x, temp.y].setType(_tile_type);
     }
 
     public Vector2 convertArrayPos2RealPos(Vector2Int pos)
@@ -120,5 +149,82 @@ public class TileMap : MonoBehaviour
         Vector2 rand_room_pos = rand_room.getRandomRealPos();
         Vector2Int include_tile_pos = getIncludeTilePos(rand_room_pos);
         return include_tile_pos;
+    }
+
+    // A* path finding
+    public List<Vector2Int> findPath(Vector2Int startPos, Vector2Int targetPos)
+    {
+        Tile startNode = getTileByTilePos(startPos);
+        Tile targetNode = getTileByTilePos(targetPos);
+
+        List<Tile> openSet = new List<Tile>();
+        HashSet<Tile> closedSet = new HashSet<Tile>();
+        openSet.Add(startNode);
+
+        while (openSet.Count > 0)
+        {
+            Tile tile = openSet[0];
+            for (int i = 1; i < openSet.Count; i++)
+            {
+                if (openSet[i].path_data.fCost < tile.path_data.fCost || openSet[i].path_data.fCost == tile.path_data.fCost)
+                {
+                    if (openSet[i].path_data.hCost < tile.path_data.hCost)
+                        tile = openSet[i];
+                }
+            }
+
+            openSet.Remove(tile);
+            closedSet.Add(tile);
+
+            if (tile == targetNode)
+            {
+                return retracePath(startNode, targetNode);
+            }
+
+            foreach (Tile neighbour in getNeighbourTile(tile.tile_pos))
+            {
+                if (!neighbour.tile_data.walkable || closedSet.Contains(neighbour))
+                {
+                    continue;
+                }
+
+                int newCostToNeighbour = tile.path_data.gCost + getDistance(tile, neighbour);
+                if (newCostToNeighbour < neighbour.path_data.gCost || !openSet.Contains(neighbour))
+                {
+                    neighbour.path_data.gCost = newCostToNeighbour;
+                    neighbour.path_data.hCost = getDistance(neighbour, targetNode);
+                    neighbour.path_data.parent = tile;
+
+                    if (!openSet.Contains(neighbour))
+                        openSet.Add(neighbour);
+                }
+            }
+        }
+
+        return new List<Vector2Int>();
+    }
+
+    private List<Vector2Int> retracePath(Tile start_tile, Tile end_tile)
+    {
+        List<Vector2Int> path = new List<Vector2Int>();
+        Tile current_tile = end_tile;
+
+        while (current_tile != start_tile)
+        {
+            path.Add(current_tile.tile_pos);
+            current_tile = current_tile.path_data.parent;
+        }
+        path.Reverse();
+        return path;
+    }
+
+    private int getDistance(Tile one, Tile other)
+    {
+        int dstX = Mathf.Abs(one.tile_pos.x - other.tile_pos.x);
+        int dstY = Mathf.Abs(one.tile_pos.y - other.tile_pos.y);
+
+        if (dstX > dstY)
+            return 14 * dstY + 10 * (dstX - dstY);
+        return 14 * dstX + 10 * (dstY - dstX);
     }
 }

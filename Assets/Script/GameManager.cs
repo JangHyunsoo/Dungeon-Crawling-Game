@@ -27,6 +27,7 @@ public class GameManager : Singleton<GameManager>
     {
         yield return StartCoroutine(MapManager.instance.init());
         PlayerMove.instance.init();
+        EnemyManager.instance.startStage();
         start_game_ = true;
     }
 }
