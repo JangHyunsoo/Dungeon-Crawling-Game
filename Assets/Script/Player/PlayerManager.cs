@@ -23,12 +23,9 @@ public class PlayerManager : Singleton<PlayerManager>
         playerable_aptitude_ = new PlayerableAptitude();
         playerable_inventory_ = new PlayerableInventory();
 
-
         playerable_.init(0);
         playerable_stat.init();
         playerable_aptitude_.init();
         playerable_inventory_.init();
-
-        playerable_stat_.debug();
     }
 }
