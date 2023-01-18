@@ -8,7 +8,6 @@ public class EnemyManager : Singleton<EnemyManager>
     private GameObject enemy_prefab_;
     private List<EnemyMove> enemy_list_ = new List<EnemyMove>();
 
-
     public void startStage()
     {
         for (int i = 0; i < 15; i++)

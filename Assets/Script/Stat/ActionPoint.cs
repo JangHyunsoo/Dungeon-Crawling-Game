@@ -6,6 +6,6 @@ public class ActionPoint : Stat
 {
     public override float getValue()
     {
-        return PlayerManager.instance.playerable_stat.getValue(StatType.DEXTERITY);
+        return 1.1f;
     }
 }
