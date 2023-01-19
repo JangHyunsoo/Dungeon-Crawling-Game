@@ -167,7 +167,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   is_dont_destroy: 0
-  enemy_prefab_: {fileID: 5496393741582411969, guid: 59b77a351c13c7c4293c338749043649, type: 3}
+  enemy_prefab_: {fileID: 3347788737092703639, guid: 70a3cd357bfc7e64386b14db0101ac81, type: 3}
 --- !u!1 &111567581
 GameObject:
   m_ObjectHideFlags: 0
