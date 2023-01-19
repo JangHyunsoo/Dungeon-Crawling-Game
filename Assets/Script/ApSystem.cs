@@ -12,7 +12,7 @@ public class ApSystem : MonoBehaviour
     protected int max_ap_count_;
     public int max_ap_count { get => max_ap_count_; }
 
-    protected float ap_value_;
+    protected float ap_value_ = 1f;
     public float ap_value { get => ap_value_; }
 
     protected float cur_value = 0f;

@@ -1053,8 +1053,8 @@ MonoBehaviour:
   road_tile_: {fileID: 3626854684731356469, guid: 0cabb3305735c24488e38bdd130b5388, type: 3}
   min_width_: 5
   min_height_: 5
-  max_width_: 10
-  max_height_: 10
+  max_width_: 15
+  max_height_: 15
   additional_route_chance_: 50
   generation_room_count_: 80
   selecte_room_count_: 20
