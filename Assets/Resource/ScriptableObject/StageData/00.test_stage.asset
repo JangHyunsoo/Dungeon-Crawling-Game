@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ebd99322cfee21d48a17b56ba6c05dd6, type: 3}
+  m_Name: 00.test_stage
+  m_EditorClassIdentifier: 
+  room_count_: 0
+  room_max_width_: 10
+  room_max_height_: 10
+  room_min_width_: 5
+  room_min_height_: 5
+  monster_count_: 15
+  mosnter_rand_amount_arr_: 3c0000001e0000000a0000000000000000000000
+  item_count_: 10
+  item_rand_amount_arr_: 3c0000001e0000000a0000000000000000000000
