@@ -10,9 +10,11 @@ GameObject:
   m_Component:
   - component: {fileID: 1070894567668688770}
   - component: {fileID: 945180581699854585}
-  - component: {fileID: 6827652062747162765}
+  - component: {fileID: 5206737206809562444}
+  - component: {fileID: 4083648524855969770}
+  - component: {fileID: -6781113031210994275}
   m_Layer: 0
-  m_Name: bat
+  m_Name: EnemyObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -83,7 +85,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &6827652062747162765
+--- !u!114 &5206737206809562444
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -92,6 +94,32 @@ MonoBehaviour:
   m_GameObject: {fileID: 5496393741582411969}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 466b08d4f904f924bbf9cfdb87d67e43, type: 3}
+  m_Script: {fileID: 11500000, guid: 2cb62385f2494644bb52949983638114, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemy_ai_: {fileID: -6781113031210994275}
+  enemy_ap_system_: {fileID: 4083648524855969770}
+--- !u!114 &4083648524855969770
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5496393741582411969}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3033154748e194d46976485d06141556, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-6781113031210994275
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5496393741582411969}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb0e7a3543819514782cd79e954ecbc6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

@@ -50,10 +50,6 @@ public class PlayerMove : Singleton<PlayerMove>
             {
                 move(pos);
             }
-            else
-            {
-                Debug.Log("cannot move");
-            }
         }
     }
 

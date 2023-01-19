@@ -1051,10 +1051,10 @@ MonoBehaviour:
   tile_base_: {fileID: 11400000, guid: 973fbb104156b994c9059abd7b93f786, type: 2}
   grid_parent_: {fileID: 1403001774}
   road_tile_: {fileID: 3626854684731356469, guid: 0cabb3305735c24488e38bdd130b5388, type: 3}
-  min_width_: 50
-  min_height_: 50
-  max_width_: 100
-  max_height_: 100
+  min_width_: 5
+  min_height_: 5
+  max_width_: 15
+  max_height_: 15
   additional_route_chance_: 50
   generation_room_count_: 80
   selecte_room_count_: 20

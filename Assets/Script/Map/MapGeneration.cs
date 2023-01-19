@@ -58,32 +58,6 @@ public class MapGeneration : MonoBehaviour
     private void Update()
     {
         if (!is_map_init_) return;
-
-        foreach (var item in vertex_graph_)
-        {            item.drawDebug();
-        }
-
-        foreach (var pos in line_end_pos)
-        {
-            switch (pos.Key)
-            {
-                case Direction.TOP:
-                    Debug.DrawLine(pos.Value, pos.Value + Vector2.one * 0.1f, Color.blue);
-                    break;
-                case Direction.BOTTOM:
-                    Debug.DrawLine(pos.Value, pos.Value + Vector2.one * 0.1f, Color.red);
-                    break;
-                case Direction.LEFT:
-                    Debug.DrawLine(pos.Value, pos.Value + Vector2.one * 0.1f, Color.black);
-                    break;
-                case Direction.RIGHT:
-                    Debug.DrawLine(pos.Value, pos.Value + Vector2.one * 0.1f, Color.white);
-                    break;
-                default:
-                    break;
-            }
-            
-        }
     }
 
     public IEnumerator gernationMap()
