@@ -66,4 +66,25 @@ public class Utility
     {
         return (AptitudeType)(int)_weapon_type;
     }
+
+    public static int getAmountRandom(float[] amount_arr)
+    {
+        float total_amount = 0;
+        foreach (var amount in amount_arr)
+        {
+            total_amount += amount;
+        }
+
+        float rand_amout = Random.RandomRange(0, total_amount);
+
+        for (int i = 0; i < amount_arr.Length; i++)
+        {
+            if(amount_arr[i] <= rand_amout)
+            {
+                return i;
+            }
+        }
+        
+        return -1;
+    }
 }

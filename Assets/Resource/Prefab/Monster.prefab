@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 945180581699854585}
   - component: {fileID: 6827652062747162765}
   m_Layer: 0
-  m_Name: bat
+  m_Name: Monster
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

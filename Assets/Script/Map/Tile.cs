@@ -7,10 +7,11 @@ public class Tile : MonoBehaviour
     private int tile_type_;
     private TileData tile_data_;
     private PathData path_data_ = new PathData();
-    private List<Item> item_list_ = new List<Item>();
 
     [SerializeField]
     private Transform entity_parent_;
+    [SerializeField]
+    private Transform item_parent_;
     [SerializeField]
     private SpriteRenderer cloud_rd_;
 
@@ -47,6 +48,19 @@ public class Tile : MonoBehaviour
         else
         {
             return entity_go == _entity;
+        }
+    }
+
+    public Item getDropItem(int _idx)
+    {
+        if(item_parent_.childCount <= _idx)
+        {
+            Debug.Log(name + " : nothing here.");
+            return null;
+        }
+        else
+        {
+            return item_parent_.GetChild(_idx).GetComponent<DropItem>().item;
         }
     }
 
