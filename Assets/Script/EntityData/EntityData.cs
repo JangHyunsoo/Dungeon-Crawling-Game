@@ -13,16 +13,16 @@ public class EntityData : ScriptableObject
     public int index_no { get => index_no_; }
 
     [SerializeField]
-    private float base_hp_;
-    public float base_hp { get => base_hp_; }
+    private int base_hp_;
+    public int base_hp { get => base_hp_; }
 
     [SerializeField]
     private float base_hp_regen_;
     public float base_hp_regen { get => base_hp_regen_; }
 
     [SerializeField]
-    private float base_mp_;
-    public float base_mp { get => base_mp_; }
+    private int base_mp_;
+    public int base_mp { get => base_mp_; }
 
     [SerializeField]
     private float base_mp_regen_;

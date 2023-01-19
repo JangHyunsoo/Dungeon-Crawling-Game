@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EenemyData : EntityData
+public class EnemyData : EntityData
 {
     [SerializeField]
     private int physical_damage_;
