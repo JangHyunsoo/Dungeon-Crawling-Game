@@ -30,14 +30,14 @@ public class PlayerMove : Singleton<PlayerMove>
     public void init()
     {
         curr_pos_ = MapManager.instance.tile_map.getRandomRoomTilePos();
-        setPositionByTilePos(curr_pos_);
+        move(curr_pos_);
     }
 
-    public void setPositionByTilePos(Vector2Int pos)
+    public void move(Vector2Int pos)
     {
-        updateSurroundTileView(false);
         curr_pos_ = pos;
-        transform.position = MapManager.instance.tile_map.getRealPosByTilePos(pos);
+        transform.position = MapManager.instance.tile_map.getRealPosByTilePos(curr_pos_);
+        MapManager.instance.tile_map.getTileByTilePos(curr_pos_).setChildEntity(transform);
         updateSurroundTileView(true);
     }
     
@@ -46,9 +46,9 @@ public class PlayerMove : Singleton<PlayerMove>
         var pos = curr_pos_ + Utility.int_to_vector_int[dir];
         if (MapManager.instance.tile_map.isOnMap(pos))
         {
-            if (MapManager.instance.tile_map.getTileByTilePos(pos).tile_data.walkable)
+            if (MapManager.instance.tile_map.getTileByTilePos(pos).walkable)
             {
-                setPositionByTilePos(pos);
+                move(pos);
             }
             else
             {

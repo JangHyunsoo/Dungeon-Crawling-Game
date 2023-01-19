@@ -10,7 +10,7 @@ public class EnemyManager : Singleton<EnemyManager>
 
     public void startStage()
     {
-        for (int i = 0; i < 15; i++)
+        for (int i = 0; i < 1000; i++)
         {
             createEnemy();
         }

@@ -2,17 +2,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyMove : MonoBehaviour
+public class EnemyMove : EntityMove
 {
-    private Vector2Int curr_pos_;
-
     private float speed_;
     private float curr_ap_;
     private Vector2Int target_pos_;
 
+    private float delay_ = 0f;
+
     public void Start()
     {
-        InvokeRepeating("act", 1f, 1f);
+
+    }
+
+    public void Update()
+    {
+        delay_ += Time.deltaTime;
+
+        if(delay_ >= 1f)
+        {
+            act();
+            delay_ -= 1f;
+        }
     }
 
     public void act()
@@ -20,20 +31,17 @@ public class EnemyMove : MonoBehaviour
         moveAi();
     }
 
-    public void move(Vector2Int pos)
-    {
-        curr_pos_ = pos;
-        transform.position = MapManager.instance.tile_map.getRealPosByTilePos(curr_pos_);
-    }
-
     private void moveAi()
     {
         target_pos_ = PlayerMove.instance.curr_pos;
-        var path = MapManager.instance.tile_map.findPath(curr_pos_, target_pos_);   
+        var path = MapManager.instance.tile_map.findPath(curr_pos_, target_pos_, 100);   
         
         if(path.Count != 0)
         {
-            move(path[0]);
+            if (MapManager.instance.tile_map.getTileByTilePos(path[0]).walkable)
+            {
+                move(path[0]);
+            }
         }
     }
 }

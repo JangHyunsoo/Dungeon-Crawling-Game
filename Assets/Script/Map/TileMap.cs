@@ -60,17 +60,6 @@ public class TileMap : MonoBehaviour
         return neighbours;
     }
 
-    public Tile getTileByTilePos(Vector2Int pos)
-    {
-        var temp = convertTilePos2ArrayPos(pos);
-        return world_tile_arr_[temp.x, temp.y];
-    }
-
-    public Vector2 getRealPosByTilePos(Vector2Int pos)
-    {
-        return getTileByTilePos(pos).transform.position;
-    }
-
     public void setWorldPos(int _world_width, int _world_height, Vector2Int _world_tile_min_pos)
     {
         world_width_ = _world_width;
@@ -89,6 +78,18 @@ public class TileMap : MonoBehaviour
             }
         }
     }
+
+    public Tile getTileByTilePos(Vector2Int pos)
+    {
+        var temp = convertTilePos2ArrayPos(pos);
+        return world_tile_arr_[temp.x, temp.y];
+    }
+
+    public Vector2 getRealPosByTilePos(Vector2Int pos)
+    {
+        return getTileByTilePos(pos).transform.position;
+    }
+
 
     public void setTileByArrayPos(Vector2Int pos, int _tile_type)
     {
@@ -152,8 +153,10 @@ public class TileMap : MonoBehaviour
     }
 
     // A* path finding
-    public List<Vector2Int> findPath(Vector2Int startPos, Vector2Int targetPos)
+    public List<Vector2Int> findPath(Vector2Int startPos, Vector2Int targetPos, int vision)
     {
+        if (getDistance(startPos, targetPos) >= vision) return new List<Vector2Int>();
+
         Tile startNode = getTileByTilePos(startPos);
         Tile targetNode = getTileByTilePos(targetPos);
 
@@ -183,12 +186,18 @@ public class TileMap : MonoBehaviour
 
             foreach (Tile neighbour in getNeighbourTile(tile.tile_pos))
             {
-                if (!neighbour.tile_data.walkable || closedSet.Contains(neighbour))
+                if (!neighbour.walkable_without_player || closedSet.Contains(neighbour))
+                {
+                    continue;
+                }
+
+                if(Vector2Int.Distance(startNode.tile_pos, neighbour.tile_pos) >= 5f)
                 {
                     continue;
                 }
 
                 int newCostToNeighbour = tile.path_data.gCost + getDistance(tile, neighbour);
+
                 if (newCostToNeighbour < neighbour.path_data.gCost || !openSet.Contains(neighbour))
                 {
                     neighbour.path_data.gCost = newCostToNeighbour;
@@ -200,7 +209,6 @@ public class TileMap : MonoBehaviour
                 }
             }
         }
-
         return new List<Vector2Int>();
     }
 
@@ -222,6 +230,16 @@ public class TileMap : MonoBehaviour
     {
         int dstX = Mathf.Abs(one.tile_pos.x - other.tile_pos.x);
         int dstY = Mathf.Abs(one.tile_pos.y - other.tile_pos.y);
+
+        if (dstX > dstY)
+            return 14 * dstY + 10 * (dstX - dstY);
+        return 14 * dstX + 10 * (dstY - dstX);
+    }
+
+    private int getDistance(Vector2Int one, Vector2Int other)
+    {
+        int dstX = Mathf.Abs(one.x - other.x);
+        int dstY = Mathf.Abs(one.y - other.y);
 
         if (dstX > dstY)
             return 14 * dstY + 10 * (dstX - dstY);
