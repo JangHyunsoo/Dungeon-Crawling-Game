@@ -35,6 +35,7 @@ public class PlayerMove : Singleton<PlayerMove>
 
     public void move(Vector2Int pos)
     {
+        updateSurroundTileView(false);
         curr_pos_ = pos;
         transform.position = MapManager.instance.tile_map.getRealPosByTilePos(curr_pos_);
         MapManager.instance.tile_map.getTileByTilePos(curr_pos_).setChildEntity(transform);
