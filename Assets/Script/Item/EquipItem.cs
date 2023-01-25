@@ -17,9 +17,8 @@ public class EquipItem : Item
 
     public bool include_addition_stat { get => addition_stat_list_.Count != 0; }
 
-    public EquipItem(ItemData _equip_item_data)
+    public EquipItem(ItemData _equip_item_data) : base(_equip_item_data)
     {
-        item_data_ = _equip_item_data;
         enhanced_value_ = 0;
 
         if (setIncludeAddition())
