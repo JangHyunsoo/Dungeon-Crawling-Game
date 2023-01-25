@@ -15,7 +15,7 @@ MonoBehaviour:
   item_name_: "\uC804\uC124\uC758 \uB3C4\uB07C"
   index_no_: 5
   item_type_: 0
-  temp_color_: {r: 0, g: 0, b: 0, a: 0}
+  temp_color_: {r: 0, g: 0, b: 0, a: 1}
   weapon_type_: 1
   base_damage_: 8
   base_speed_: 5

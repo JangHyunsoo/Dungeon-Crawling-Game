@@ -16,6 +16,7 @@ public class GameManager : Singleton<GameManager>
     private void initDataBase()
     {
         TileDataBase.instance.init();
+        ItemDatabase.instance.init();
     }
 
     private void initManager()
@@ -28,6 +29,7 @@ public class GameManager : Singleton<GameManager>
         yield return StartCoroutine(MapManager.instance.init());
         PlayerMove.instance.init();
         EnemyManager.instance.startStage();
+        ItemManager.instance.init();
         start_game_ = true;
     }
 }

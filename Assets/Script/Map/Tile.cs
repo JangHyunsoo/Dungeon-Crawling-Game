@@ -24,32 +24,7 @@ public class Tile : MonoBehaviour
     public bool walkable { get => tile_data_.walkable && !is_under; }
     public bool walkable_without_player { get => tile_data_.walkable && (!is_under || entity_go.CompareTag("Player")); }
 
-
     private Color memory_color = new Color(1f, 1f, 1f, 0.5f);
-
-    public bool checkWalkable(GameObject _entity)
-    {
-        if(!is_under || checkEqualEntity(_entity))
-        {
-            return tile_data_.walkable;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    private bool checkEqualEntity(GameObject _entity)
-    {
-        if (!is_under)
-        {
-            return false;
-        }
-        else
-        {
-            return entity_go == _entity;
-        }
-    }
 
     public Item getDropItem(int _idx)
     {
@@ -62,6 +37,12 @@ public class Tile : MonoBehaviour
         {
             return item_parent_.GetChild(_idx).GetComponent<DropItem>().item;
         }
+    }
+
+    public void addDropItem(DropItem _drop_item)
+    {
+        _drop_item.transform.SetParent(item_parent_);
+        _drop_item.transform.position = item_parent_.position;
     }
 
     public void setType(int _tile_type)
