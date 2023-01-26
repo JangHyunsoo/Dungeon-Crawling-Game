@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   item_name_: "\uC608\uB9AC\uD55C \uAC80"
   index_no_: 1
+  item_rarlity_: 2
   item_type_: 0
-  temp_color_: {r: 1, g: 0.5613208, b: 0.5613208, a: 1}
+  temp_color_: {r: 0.876672, g: 0.35457456, b: 0.9056604, a: 1}
   weapon_type_: 0
   base_damage_: 7
   base_speed_: 5

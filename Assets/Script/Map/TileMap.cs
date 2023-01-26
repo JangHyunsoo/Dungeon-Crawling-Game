@@ -152,6 +152,12 @@ public class TileMap : MonoBehaviour
         return include_tile_pos;
     }
 
+    public Tile getRandomRoomTile()
+    {
+        var tile_pos = getRandomRoomTilePos();
+        return getTileByTilePos(tile_pos);
+    }
+
     // A* path finding
     public List<Vector2Int> findPath(Vector2Int startPos, Vector2Int targetPos, int vision)
     {

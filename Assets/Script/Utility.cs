@@ -11,6 +11,13 @@ public enum Direction
     RIGHT
 }
 
+[System.Serializable]
+public class RarlityPercentPair
+{
+    public int rarlity;
+    public float percent;
+}
+
 public class Utility
 {
     public static Dictionary<Direction, Vector2> direction_to_vector = new Dictionary<Direction, Vector2>
@@ -86,5 +93,29 @@ public class Utility
         }
         
         return -1;
+    }
+
+    public static int getRandRarlityByRarlityArr(RarlityPercentPair[] rarlity_arr)
+    {
+        float total_value = 0;
+        int select_rarlity = -1;
+        foreach (var item in rarlity_arr)
+        {
+            total_value += item.percent;
+        }
+
+        float rand_value = Random.RandomRange(0, total_value);
+
+        foreach (var item in rarlity_arr)
+        {
+            if (rand_value <= item.percent)
+            {
+                select_rarlity = item.rarlity;
+                break;
+            }
+            rand_value -= item.percent;
+        }
+
+        return select_rarlity;
     }
 }

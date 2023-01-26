@@ -32,8 +32,8 @@ public class StageData : ScriptableObject
     public int monster_count { get => monster_count_; }
 
     [SerializeField]
-    private int[] mosnter_rand_amount_arr_;
-    public int[] mosnter_rand_amount_arr { get => mosnter_rand_amount_arr_; }
+    private RarlityPercentPair[] mosnter_rand_amount_arr_;
+    public RarlityPercentPair[] mosnter_rand_amount_arr { get => mosnter_rand_amount_arr_; }
 
     [Header("Item Info")]
     [SerializeField]
@@ -41,7 +41,7 @@ public class StageData : ScriptableObject
     public int item_count { get => item_count_; }
 
     [SerializeField]
-    private int[] item_rand_amount_arr_;
-    public int[] item_rand_amount_arr { get => item_rand_amount_arr_; }
+    private RarlityPercentPair[] item_rand_amount_arr_;
+    public RarlityPercentPair[] item_rand_amount_arr { get => item_rand_amount_arr_; }
 
 }

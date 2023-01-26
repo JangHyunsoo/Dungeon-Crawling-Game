@@ -18,6 +18,26 @@ MonoBehaviour:
   room_min_width_: 5
   room_min_height_: 5
   monster_count_: 15
-  mosnter_rand_amount_arr_: 3c0000001e0000000a0000000000000000000000
+  mosnter_rand_amount_arr_:
+  - rarlity: 1
+    percent: 60
+  - rarlity: 2
+    percent: 30
+  - rarlity: 3
+    percent: 10
+  - rarlity: 4
+    percent: 0
+  - rarlity: 5
+    percent: 0
   item_count_: 10
-  item_rand_amount_arr_: 3c0000001e0000000a0000000000000000000000
+  item_rand_amount_arr_:
+  - rarlity: 1
+    percent: 60
+  - rarlity: 2
+    percent: 30
+  - rarlity: 3
+    percent: 10
+  - rarlity: 4
+    percent: 0
+  - rarlity: 5
+    percent: 0

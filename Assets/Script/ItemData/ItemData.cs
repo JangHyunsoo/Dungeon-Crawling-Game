@@ -13,6 +13,11 @@ public class ItemData : ScriptableObject
     public int index_no { get => index_no_; }
 
     [SerializeField]
+    private int item_rarlity_;
+    public int item_rarlity { get => item_rarlity_; }
+
+
+    [SerializeField]
     private ItemType item_type_;
     public ItemType item_type { get => item_type_; }
 

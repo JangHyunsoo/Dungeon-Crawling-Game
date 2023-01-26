@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[CreateAssetMenu]
 public class EnemyData : EntityData
 {
     [SerializeField]
@@ -15,6 +16,14 @@ public class EnemyData : EntityData
     [SerializeField]
     private float ap_value_;
     public float ap_value { get => ap_value_; }
+
+    [SerializeField]
+    private int rarlity_;
+    public int rarlity { get => rarlity_; }
+
+    [SerializeField]
+    private Color color_;
+    public  Color color { get => color_; }
 
     // 마법 종류, 데미지, 회피, 저항 등등 추가..
 }

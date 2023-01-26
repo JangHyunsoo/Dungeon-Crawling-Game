@@ -45,20 +45,9 @@ public class MapGeneration : MonoBehaviour
     private List<LineData> vertex_graph_ = new List<LineData>();
     private List<LineData> unselected_lines_ = new List<LineData>();
 
-    private List<KeyValuePair<Direction, Vector2>> line_end_pos = new List<KeyValuePair<Direction, Vector2>>();
-
     private bool[,] tile_exist_;
 
     private bool is_map_init_ = false;
-
-    private void Start()
-    {
-    }
-
-    private void Update()
-    {
-        if (!is_map_init_) return;
-    }
 
     public IEnumerator gernationMap()
     {
@@ -438,14 +427,12 @@ public class MapGeneration : MonoBehaviour
         float dir_angle = Mathf.Atan2(dir.y, dir.x);
 
         var start_door = getRoadStartInfo(start_room, dir_angle);
-        line_end_pos.Add(start_door);
 
         //end pos
         dir = start_room_pos - end_room_pos;
         dir_angle = Mathf.Atan2(dir.y, dir.x);
 
         var end_door = getRoadStartInfo(end_room, dir_angle);
-        line_end_pos.Add(end_door);
 
         connectVertex(start_door, end_door);
     }

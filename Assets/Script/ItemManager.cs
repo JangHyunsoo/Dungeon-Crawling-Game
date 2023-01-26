@@ -11,25 +11,30 @@ public class ItemManager : Singleton<ItemManager>
     {
         for (int i = 0; i < 10; i++)
         {
-            var tile_pos = MapManager.instance.tile_map.getRandomRoomTilePos();
-            var tile = MapManager.instance.tile_map.getTileByTilePos(tile_pos);
-            tile.addDropItem(createDropItem(0));
+            var item_data = ItemDatabase.instance.getRandomItemInTotalItem(StageManager.instance.curr_stage_data.item_rand_amount_arr);
+            createDropItemInRandomPos(item_data);
         }
     }
 
-    public DropItem createDropItem(int _idx)
+    public DropItem createDropItemInRandomPos(ItemData item_data)
+    {
+        var tile = MapManager.instance.tile_map.getRandomRoomTile();
+        var drop_item = createDropItem(item_data);
+        tile.addDropItem(drop_item);
+        return drop_item;
+    }
+
+    public DropItem createDropItem(ItemData item_data)
     {
         var drop_item_go = GameObject.Instantiate(drop_item_prefab_);
         var drop_item_cp = drop_item_go.GetComponent<DropItem>();
-        var item = createItem(_idx);
+        var item = createItem(item_data);
         drop_item_cp.setItem(item);
         return drop_item_cp;
     }
 
-    private Item createItem(int _idx)
+    private Item createItem(ItemData item_data)
     {
-        ItemData item_data = ItemDatabase.instance.getItemData(_idx);
-
         switch (item_data.item_type)
         {
             case ItemType.WEAPON:
@@ -48,6 +53,5 @@ public class ItemManager : Singleton<ItemManager>
                 Debug.LogError("null item type");
                 return new Item(item_data);
         }
-
     }
 }

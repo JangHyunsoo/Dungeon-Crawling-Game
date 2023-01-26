@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   item_name_: "\uC804\uD22C \uB3C4\uB07C"
   index_no_: 4
+  item_rarlity_: 2
   item_type_: 0
   temp_color_: {r: 1, g: 0.7221767, b: 0.4009434, a: 1}
   weapon_type_: 1
