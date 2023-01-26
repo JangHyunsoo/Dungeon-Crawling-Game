@@ -7,6 +7,7 @@ public class BaseStat : Stat
     protected float base_stat_;
     protected float addition_stat_;
     protected float level_per_stat_;
+
     protected StatType stat_type_;
 
 

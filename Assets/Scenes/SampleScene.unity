@@ -361,8 +361,8 @@ GameObject:
   - component: {fileID: 480466104}
   - component: {fileID: 480466110}
   - component: {fileID: 480466109}
-  - component: {fileID: 480466108}
   - component: {fileID: 480466107}
+  - component: {fileID: 480466108}
   m_Layer: 0
   m_Name: Playable
   m_TagString: Untagged
@@ -382,6 +382,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7da7a057cbad684d9db6a9bde0f86e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playable_stat_: {fileID: 480466110}
+  playable_aptitude_: {fileID: 480466109}
+  playable_inventory_: {fileID: 480466108}
+  playable_equipment_: {fileID: 480466107}
 --- !u!212 &480466105
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -468,7 +472,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 480466103}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d3c7a1497cf88ba46af1491cfb41b936, type: 3}
+  m_Script: {fileID: 11500000, guid: 263aa2668cc85b9469618abf8fcfa96a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &480466109
@@ -871,12 +875,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5fc0e89801d1b1c4796e4784baa7b1ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  is_ready_: 0
-  cur_ap_count_: 0
-  max_ap_count_: 0
-  ap_value_: 1
-  cur_value: 0
-  max_value: 1
 --- !u!1 &1051099519
 GameObject:
   m_ObjectHideFlags: 0
@@ -1017,7 +1015,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1164110350
 GameObject:
@@ -1157,6 +1155,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   is_dont_destroy: 0
+  playable_: {fileID: 480466104}
 --- !u!4 &1305464683
 Transform:
   m_ObjectHideFlags: 0
@@ -1490,7 +1489,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 13
+  m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1842799070
 GameObject:
@@ -1522,7 +1521,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   is_dont_destroy: 0
-  playable_data_arr_: []
+  playable_data_arr_:
+  - {fileID: 11400000, guid: fb6f7749adc5af74c86a6b6b77cf385c, type: 2}
 --- !u!4 &1842799072
 Transform:
   m_ObjectHideFlags: 0
@@ -10736,7 +10736,7 @@ RectTransform:
   - {fileID: 88351748038332575}
   - {fileID: 88351748318454729}
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
