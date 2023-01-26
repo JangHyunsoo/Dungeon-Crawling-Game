@@ -20,6 +20,14 @@ public enum WeaponType
     BLUNT = 3
 }
 
+public enum ArmorType
+{ 
+    ROB,
+    LEATHER,
+    SCALE,
+    PLATE
+}
+
 public enum AptitudeType
 {
     SWORD = 0,

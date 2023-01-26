@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Dexterity : BaseStat
 {
-    public Dexterity() : base()
+    public Dexterity(StatType _stat_type) : base(_stat_type)
     {
-        base_stat_ = PlayerManager.instance.playerable.playerable_data.base_dexterity;
+        base_stat_ = PlayerManager.instance.playable.playable_data.base_dexterity;
     }
 }

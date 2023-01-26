@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class HpRegen : BaseStat
 {
-    public HpRegen() : base()
+    public HpRegen(StatType _stat_type) : base(_stat_type)
     {
-        base_stat_ = PlayerManager.instance.playerable.playerable_data.base_hp_regen;
+        base_stat_ = PlayerManager.instance.playable.playable_data.base_hp_regen;
     }
 }

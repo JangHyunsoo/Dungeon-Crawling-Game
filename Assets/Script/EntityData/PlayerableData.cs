@@ -2,8 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Playerable data", menuName = "EntityData/PlayerableData", order = 1)]
-public class PlayerableData : EntityData
+[CreateAssetMenu(fileName = "Playable data", menuName = "EntityData/PlayableData", order = 1)]
+public class PlayableData : EntityData
 {
     [SerializeField]
     private int base_strength_;

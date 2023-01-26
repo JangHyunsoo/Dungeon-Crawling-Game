@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class MaxMp : BaseStat
 {
-    public MaxMp() : base()
+    public MaxMp(StatType _stat_type) : base(_stat_type)
     {
-        base_stat_ = PlayerManager.instance.playerable.playerable_data.base_mp;
+        base_stat_ = PlayerManager.instance.playable.playable_data.base_mp;
     }
 }

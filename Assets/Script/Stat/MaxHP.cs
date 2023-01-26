@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class MaxHp : BaseStat
 {
-    public MaxHp() : base()
+    public MaxHp(StatType _stat_type) : base(_stat_type)
     {
-        base_stat_ = PlayerManager.instance.playerable.playerable_data.base_hp;
+        base_stat_ = PlayerManager.instance.playable.playable_data.base_hp;
     }
 }
