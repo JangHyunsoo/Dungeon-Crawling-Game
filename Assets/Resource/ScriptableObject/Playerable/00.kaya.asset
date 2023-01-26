@@ -9,29 +9,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 641c8c7cd9db93c4197b2a69bc4c777e, type: 3}
-  m_Name: 00.kaya
-  m_EditorClassIdentifier: 
-  entity_name_: Kaya
+  m_Script: {fileID: 0}
+  m_Name: 00.Kaya
+  m_EditorClassIdentifier: Assembly-CSharp::PlayableData
+  entity_name_: 
   index_no_: 0
-  base_hp_: 100
-  base_hp_regen_: 1
-  base_mp_: 100
-  base_mp_regen_: 1
-  base_strength_: 5
-  base_intelligent_: 5
-  base_dexterity_: 5
-  base_armor_value_: 5
-  base_aptitude_value_arr_:
-  - aptitude_type: 0
-    value: 0
-  - aptitude_type: 1
-    value: 0
-  - aptitude_type: 2
-    value: 0
-  - aptitude_type: 3
-    value: 0
-  - aptitude_type: 4
-    value: 0
-  - aptitude_type: 5
-    value: 0
+  base_hp_: 0
+  base_hp_regen_: 0
+  base_mp_: 0
+  base_mp_regen_: 0
+  base_strength_: 0
+  base_intelligent_: 0
+  base_dexterity_: 0
+  base_armor_value_: 0
+  base_aptitude_value_arr_: []

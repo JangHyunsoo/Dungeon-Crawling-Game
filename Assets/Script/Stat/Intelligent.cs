@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Intelligent : BaseStat 
 {
-    public Intelligent() : base()
+    public Intelligent(StatType _stat_type) : base(_stat_type)
     {
-        base_stat_ = PlayerManager.instance.playerable.playerable_data.base_intelligent;
+        base_stat_ = PlayerManager.instance.playable.playable_data.base_intelligent;
     }
 }

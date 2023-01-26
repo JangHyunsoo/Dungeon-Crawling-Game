@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerableAptitude
+public class PlayableAptitude : MonoBehaviour
 {
     private Dictionary<AptitudeType, int> base_aptitude_value_dic_ = new Dictionary<AptitudeType, int>();
 
@@ -11,7 +11,7 @@ public class PlayerableAptitude
 
     public void init()
     {
-        foreach (var aptitude_pair in PlayerManager.instance.playerable.playerable_data.base_aptitude_value_arr)
+        foreach (var aptitude_pair in PlayerManager.instance.playable.playable_data.base_aptitude_value_arr)
         {
             base_aptitude_value_dic_.Add(aptitude_pair.aptitude_type, aptitude_pair.value);
             aptitude_level_dic_.Add(aptitude_pair.aptitude_type, new LevelData { cur_level = 0, cur_experience = 0, max_experience = 10 });
