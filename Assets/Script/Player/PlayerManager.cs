@@ -8,9 +8,6 @@ public class PlayerManager : Singleton<PlayerManager>
     private Playable playable_;
     public Playable playable { get => playable_; }
 
-    private PlayableApSystem playable_ap_system_;
-    public PlayableApSystem playable_ap_system { get => playable_ap_system; }
-
     public void Start()
     {
         playable_.init(0);
