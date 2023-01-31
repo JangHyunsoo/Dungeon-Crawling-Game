@@ -29,7 +29,7 @@ MonoBehaviour:
     percent: 0
   - rarlity: 5
     percent: 0
-  item_count_: 10
+  item_count_: 100
   item_rand_amount_arr_:
   - rarlity: 1
     percent: 60

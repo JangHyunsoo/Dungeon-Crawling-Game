@@ -20,9 +20,10 @@ public class Tile : MonoBehaviour
     public TileData tile_data { get => tile_data_; }
     public PathData path_data { get => path_data_; }
     public GameObject entity_go { get => entity_parent_.GetChild(0).gameObject; }
-    public bool is_under { get => entity_parent_.childCount != 0; }
-    public bool walkable { get => tile_data_.walkable && !is_under; }
-    public bool walkable_without_player { get => tile_data_.walkable && (!is_under || entity_go.CompareTag("Player")); }
+    public bool is_under_item { get => item_parent_.childCount != 0; }
+    public bool is_under_entity { get => entity_parent_.childCount != 0; }
+    public bool walkable { get => tile_data_.walkable && !is_under_entity; }
+    public bool walkable_without_player { get => tile_data_.walkable && (!is_under_entity || entity_go.CompareTag("Player")); }
 
     private Color memory_color = new Color(1f, 1f, 1f, 0.5f);
 
@@ -37,6 +38,11 @@ public class Tile : MonoBehaviour
         {
             return item_parent_.GetChild(_idx).GetComponent<DropItem>().item;
         }
+    }
+
+    public DropItem[] getDropItems()
+    {
+        return item_parent_.GetComponentsInChildren<DropItem>();
     }
 
     public void addDropItem(DropItem _drop_item)
