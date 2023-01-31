@@ -49,6 +49,8 @@ public class ItemManager : Singleton<ItemManager>
                 return new Item(item_data);
             case ItemType.OTHER:
                 return new Item(item_data);
+            case ItemType.NONE:
+                return new Item(item_data);
             default:
                 Debug.LogError("null item type");
                 return new Item(item_data);
