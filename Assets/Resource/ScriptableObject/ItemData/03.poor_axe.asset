@@ -15,7 +15,8 @@ MonoBehaviour:
   item_name_: "\uD5C8\uC811\uD55C \uB3C4\uB07C"
   index_no_: 3
   item_rarlity_: 1
-  item_type_: 1
+  item_type_: 0
+  item_sprite_: {fileID: 21300000, guid: d5ecf5bc9a8f6ea4dadc703aa4f18871, type: 3}
   temp_color_: {r: 1, g: 0.8727695, b: 0.7311321, a: 1}
   weapon_type_: 1
   base_damage_: 4

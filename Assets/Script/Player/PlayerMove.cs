@@ -39,6 +39,7 @@ public class PlayerMove : Singleton<PlayerMove>
         curr_pos_ = pos;
         transform.position = MapManager.instance.tile_map.getRealPosByTilePos(curr_pos_);
         MapManager.instance.tile_map.getTileByTilePos(curr_pos_).setChildEntity(transform);
+        UIManager.instance.pickup_ui.updatePickUpByTilePos(curr_pos);
         updateSurroundTileView(true);
     }
     

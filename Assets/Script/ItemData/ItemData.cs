@@ -22,6 +22,10 @@ public class ItemData : ScriptableObject
     public ItemType item_type { get => item_type_; }
 
     [SerializeField]
+    private Sprite item_sprite_;
+    public Sprite item_sprite { get => item_sprite_; }
+
+    [SerializeField]
     private Color temp_color_;
     public Color temp_color { get => temp_color_; }
 

@@ -9,7 +9,7 @@ public class ItemManager : Singleton<ItemManager>
     
     public void init()
     {
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 100; i++)
         {
             var item_data = ItemDatabase.instance.getRandomItemInTotalItem(StageManager.instance.curr_stage_data.item_rand_amount_arr);
             createDropItemInRandomPos(item_data);
