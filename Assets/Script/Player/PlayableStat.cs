@@ -25,11 +25,6 @@ public class PlayableStat : MonoBehaviour
         stat_dic_.Add(StatType.CASTING_CHANCE, new CastingChance()); 
     }
 
-    public void addValue(StatType _stat_type, float _value)
-    {
-        ((BaseStat)stat_dic_[_stat_type]).setAdditionValue(_value);
-    }
-
     public float getValue(StatType _stat_type)
     {
         return stat_dic_[_stat_type].getValue();

@@ -13,9 +13,7 @@ public class ItemSlotUI : MonoBehaviour, IPointerClickHandler
 
     public void setItemSlotData(int _index)
     {
-        item_data_index_ = _index;
-
- //       item_image_.color = PlayerManager.instance.playable_inventory.getItemToIndexNum(_index).item_data.temp_color;
+        item_data_index_ = _index;   
     }
 
     public void OnPointerClick(PointerEventData eventData)

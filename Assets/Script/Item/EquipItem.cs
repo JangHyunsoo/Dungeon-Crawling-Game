@@ -17,9 +17,9 @@ public class EquipItem : Item
 
     public bool include_addition_stat { get => addition_stat_dic_.Count != 0; }
 
+    // need addition_stat setting option value 
     public EquipItem(ItemData _equip_item_data) : base(_equip_item_data)
     {
-        item_data_ = _equip_item_data;
         enhanced_value_ = 0;
         setAdditionStatDic();
 
@@ -41,7 +41,7 @@ public class EquipItem : Item
         addition_stat_dic_[StatType.ARMOR_VALUE] = 0f;
     }
 
-    // 네이밍 수정 요망 > 모호한 이름 
+    // need changing function naming
     protected virtual bool setIncludeAddition()
     {
         const int hidden_weapon_chance = 40;

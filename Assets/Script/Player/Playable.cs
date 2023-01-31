@@ -32,6 +32,6 @@ public class Playable : MonoBehaviour
         playable_stat_.init();
         playable_aptitude_.init();
         playable_inventory_.init();
-        //playable_equipment_.init();
+        playable_equipment_.init();
     }
 }

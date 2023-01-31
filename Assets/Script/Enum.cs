@@ -4,6 +4,7 @@ using UnityEngine;
 
 public enum ItemType
 {
+    NONE,
     WEAPON,
     ARMOR,
     RING,
@@ -26,6 +27,13 @@ public enum ArmorType
     LEATHER,
     SCALE,
     PLATE
+}
+
+public enum RingType
+{
+    HPREGEN,
+    MPREGEN,
+    MAGICRES
 }
 
 public enum AptitudeType

@@ -5,17 +5,12 @@ using UnityEngine;
 public class BaseStat : Stat
 {
     protected float base_stat_;
-    protected float addition_stat_;
-    protected float level_per_stat_;
-
     protected StatType stat_type_;
 
 
     protected BaseStat(StatType _stat_type)
     {
         stat_type_ = _stat_type;
-        addition_stat_ = 0f;
-        level_per_stat_ = 0f;
     }
 
     public override float getValue()
@@ -24,13 +19,9 @@ public class BaseStat : Stat
 
         var weapon_bonus = playable_equipment.weapon.addition_stat_dic[stat_type_];
         var armor_bonus = playable_equipment.armor.addition_stat_dic[stat_type_];
+        var ring_bonus = playable_equipment.ring_arr[0].addition_stat_dic[stat_type_] + playable_equipment.ring_arr[1].addition_stat_dic[stat_type_];
 
-        return 1f;
-    }
-
-    public void setAdditionValue(float _value)
-    {
-        addition_stat_ += _value;
+        return weapon_bonus + armor_bonus + ring_bonus;
     }
 }
 
