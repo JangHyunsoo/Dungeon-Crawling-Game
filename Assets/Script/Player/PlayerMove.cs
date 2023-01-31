@@ -12,18 +12,22 @@ public class PlayerMove : Singleton<PlayerMove>
         if (Input.GetKeyDown(KeyCode.DownArrow))
         {
             movePlayer(0);
+            TurnSystem.instance.runTurn(1f);
         }
         else if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             movePlayer(1);
+            TurnSystem.instance.runTurn(1f);
         }
         else if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             movePlayer(2);
+            TurnSystem.instance.runTurn(1f);
         }
         else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             movePlayer(3);
+            TurnSystem.instance.runTurn(1f);
         }
     }
 
