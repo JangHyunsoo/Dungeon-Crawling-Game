@@ -3978,6 +3978,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3c7a1497cf88ba46af1491cfb41b936, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  none_item_data_arr_:
+  - {fileID: 11400000, guid: f78e6a8be7e3e4f42b5f39abf8c292d2, type: 2}
+  - {fileID: 11400000, guid: 744ff77458c40cf4cb3a058de70c4abf, type: 2}
+  - {fileID: 11400000, guid: ac4c66f069bf001488022b2ae5f21510, type: 2}
 --- !u!114 &480466108
 MonoBehaviour:
   m_ObjectHideFlags: 0
