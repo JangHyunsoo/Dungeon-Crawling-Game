@@ -18,7 +18,7 @@ public class ItemManager : Singleton<ItemManager>
 
     public DropItem createDropItemInRandomPos(ItemData item_data)
     {
-        var tile = MapManager.instance.tile_map.getRandomRoomTile();
+        var tile = MapManager.instance.getCurMap().getRandomRoomTile();
         var drop_item = createDropItem(item_data);
         tile.addDropItem(drop_item);
         return drop_item;

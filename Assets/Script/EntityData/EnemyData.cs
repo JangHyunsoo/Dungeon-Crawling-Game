@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu]
+[CreateAssetMenu(fileName = "Enemy data", menuName = "EntityData/EnemyData", order = 1)]
 public class EnemyData : EntityData
 {
     [SerializeField]
@@ -14,8 +14,8 @@ public class EnemyData : EntityData
     public int armor_value { get => armor_value_; }
 
     [SerializeField]
-    private float ap_value_;
-    public float ap_value { get => ap_value_; }
+    private float action_value_;
+    public float action_value { get => action_value_; }
 
     [SerializeField]
     private int rarlity_;
@@ -24,6 +24,10 @@ public class EnemyData : EntityData
     [SerializeField]
     private Color color_;
     public  Color color { get => color_; }
+
+    [SerializeField]
+    private Sprite sprite_;
+    public Sprite sprite { get => sprite_; }
 
     // 마법 종류, 데미지, 회피, 저항 등등 추가..
 }

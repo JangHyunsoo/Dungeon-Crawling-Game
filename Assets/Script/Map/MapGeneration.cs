@@ -10,34 +10,22 @@ public class MapGeneration : MonoBehaviour
 {
     [Header("Room Generation")]
     [SerializeField]
-    private GameObject tile_map_prefab_;
+    private GameObject map_prefab_;
+    [SerializeField]
+    private GameObject room_prefab_;
     [SerializeField]
     private TileBase tile_base_;
     [SerializeField]
+    private GameObject road_tile_;
+    [SerializeField]
     private Transform grid_parent_;
 
-    private float tile_size_ = 32;
+    private float tile_size_ = 0.32f;
 
-    [SerializeField]
-    private GameObject road_tile_;
+    private StageData stage_data_;
 
-    [SerializeField]
-    private int min_width_;
-    [SerializeField]
-    private int min_height_;
-    [SerializeField]
-    private int max_width_;
-    [SerializeField]
-    private int max_height_;
-
-    [SerializeField]
-    [Range(0, 100f)]
-    private float additional_route_chance_ = 30f;
-
-    [SerializeField]
-    private int generation_room_count_;
-    [SerializeField]
-    private int selecte_room_count_;
+    private TileMap tile_map_;
+    public TileMap tile_map { get => tile_map_; }
 
     private List<Transform> room_tr_list_ = new List<Transform>();
     private List<Vertex> vertex_list_ = new List<Vertex>();
@@ -45,109 +33,100 @@ public class MapGeneration : MonoBehaviour
     private List<LineData> vertex_graph_ = new List<LineData>();
     private List<LineData> unselected_lines_ = new List<LineData>();
 
-    private bool[,] tile_exist_;
-
-    private bool is_map_init_ = false;
-
-    public IEnumerator gernationMap()
+    public IEnumerator generate(StageData _stage_data)
     {
-        yield return StartCoroutine(gernationMapCoroutine(5f));
+        yield return StartCoroutine(logic(_stage_data));
     }
 
-    private void generationRoom(int _room_size)
+    private IEnumerator logic(StageData _stage_data)
     {
-        for (int i = 0; i < _room_size; i++)
-        {
-            generateRoom();
-        }
-        onColliderComponent();
-    }
+        tile_map_ = GameObject.Instantiate(map_prefab_, Vector3.zero, Quaternion.identity).GetComponent<TileMap>();
+        stage_data_ = _stage_data;
 
-    private void onColliderComponent()
-    {
-        foreach (var room in room_tr_list_)
-        {
-            room.GetComponent<BoxCollider2D>().enabled = true;
-        }
-    }
-
-    private void offColliderComponent()
-    {
-        foreach (var room in room_tr_list_)
-        {
-            room.GetComponent<BoxCollider2D>().enabled = false;
-        }
-    }
-
-    private IEnumerator gernationMapCoroutine(float _delay)
-    {
-        generationRoom(generation_room_count_);
+        generateRoom();
+        controlColliderComponent(true);
         Time.timeScale = 20f;
-        yield return new WaitForSeconds(_delay);
+        yield return new WaitForSeconds(20f);
         Time.timeScale = 1f;
         correctRoomPosition();
-        selecteRoom();
+        selectRoom();
         convertRoomToVertex();
         getTriangleComb();
-        setupCheckedTriangle();
-        setupGraph();
+        setCheckedTriangle();        
+        setGraph();        
         calculKruskal();
         selectRandomRoute();
-        setupTileArray();
+        setTileArray();
         linkRooms();
-        is_map_init_ = true;
+    }
+
+    private void generateRoom()
+    {
+        int room_count = stage_data_.target_room_count * 5;
+
+        for (int i = 0; i < room_count; i++)
+        {
+            int width = Random.RandomRange(stage_data_.room_min_width, stage_data_.room_max_width);
+            int height = Random.RandomRange(stage_data_.room_min_height, stage_data_.room_max_height);
+            int random_angle = Random.RandomRange(0, 360);
+
+            // tile_map_prefab 네이밍 수정 고려
+            var go = GameObject.Instantiate(room_prefab_, new Vector3(Mathf.Cos(random_angle), Mathf.Sin(random_angle), 0), Quaternion.identity);
+            var col = go.GetComponent<BoxCollider2D>();
+            col.size = new Vector2(width * tile_size_, height * tile_size_);
+            col.offset = new Vector2(col.size.x / 2f, col.size.y / 2f);
+
+            // 룸 부모 수정
+            go.transform.SetParent(grid_parent_);
+
+            room_tr_list_.Add(go.transform);
+        }
+    }
+
+    private void controlColliderComponent(bool _value)
+    {
+        foreach (var room in room_tr_list_)
+        {
+            room.GetComponent<BoxCollider2D>().enabled = _value;
+        }
     }
 
     private void correctRoomPosition()
     {
         foreach (var room in room_tr_list_)
         {
-            float corrected_x = 0.32f * Mathf.FloorToInt(room.position.x / 0.32f);
-            float corrected_y = 0.32f * Mathf.FloorToInt(room.position.y / 0.32f);
+            float corrected_x = 0.32f * Mathf.FloorToInt(room.position.x / tile_size_);
+            float corrected_y = 0.32f * Mathf.FloorToInt(room.position.y / tile_size_);
 
             room.position = new Vector3(corrected_x, corrected_y, 0);
         }
     }
 
-    private void generateRoom()
-    {
-        int width = Random.RandomRange(min_width_, max_width_);
-        int height = Random.RandomRange(min_height_, max_height_);
-        int random_angle = Random.RandomRange(0, 360);
-
-        var go = GameObject.Instantiate(tile_map_prefab_, new Vector3(Mathf.Cos(random_angle), Mathf.Sin(random_angle), 0), Quaternion.identity);
-        var col = go.GetComponent<BoxCollider2D>();
-        col.size = new Vector2(width * 0.32f, height * 0.32f);
-        col.offset = new Vector2(col.size.x / 2f, col.size.y / 2f);
-        go.transform.SetParent(grid_parent_);
-
-        room_tr_list_.Add(go.transform);
-    }
-
-    private void selecteRoom()
+    private void selectRoom()
     {
         var random_integer_arr = Utility.getShuffleArray(room_tr_list_.Count);
         var selected_room_list = new List<Transform>();
         int selected_room_count = 0;
 
-        for (int i = 0; i < room_tr_list_.Count && selected_room_count < selecte_room_count_; i++)
+        for (int i = 0; i < room_tr_list_.Count && selected_room_count < stage_data_.target_room_count; i++)
         {
             var cur_room_tr_ = room_tr_list_[i];
+
             if (cur_room_tr_.gameObject.active)
             {
                 selected_room_list.Add(cur_room_tr_);
                 selected_room_count++;
                 var box_collider = cur_room_tr_.GetComponent<BoxCollider2D>();
-                // box_collider.enabled = false;
+
                 cur_room_tr_.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
-                var col_size = box_collider.size + Vector2.one * 0.65f;
+                var col_size = box_collider.size + Vector2.one * (2 * tile_size_ + 0.01f);
                 var room_pivot = cur_room_tr_.transform.position + new Vector3(box_collider.offset.x, box_collider.offset.y);
 
-                var hits = Physics2D.OverlapBoxAll(room_pivot, col_size, 0f);
+                var hit_rooms = Physics2D.OverlapBoxAll(room_pivot, col_size, 0f);
 
-                foreach (var hit in hits)
+                foreach (var room in hit_rooms)
                 {
-                    hit.transform.gameObject.SetActive(false);
+                    room.transform.gameObject.SetActive(false);
                 }
             }
         }
@@ -164,7 +143,7 @@ public class MapGeneration : MonoBehaviour
 
         foreach (var room_tr in room_tr_list_)
         {
-            if (room_tr.gameObject.active == false)
+            if (!room_tr.gameObject.active)
             {
                 Destroy(room_tr.gameObject);
             }
@@ -179,24 +158,24 @@ public class MapGeneration : MonoBehaviour
 
         for (int i = 0; i < room_tr_list_.Count; i++)
         {
-            var bc = room_tr_list_[i].GetComponent<BoxCollider2D>();
             room_list.Add(new Room(i, room_tr_list_[i]));
             vertex_list_.Add(room_list[i].getVertex());
         }
 
-        MapManager.instance.tile_map.setRoomArr(room_list);
+        tile_map_.setRoomArr(room_list);
     }
 
     private void getTriangleComb()
     {
         int r = 3;
         List<Triangle> result = new List<Triangle>();
-        Combination(result, new List<Vertex>(), 3, 0);
+
+        combination(result, new List<Vertex>(), r, 0);
 
         triangle_arr_ = result.ToArray();
     }
 
-    private void Combination(List<Triangle> result, List<Vertex> comb, int r, int depth)
+    private void combination(List<Triangle> result, List<Vertex> comb, int r, int depth)
     {
         if (r == 0)
         {
@@ -208,14 +187,14 @@ public class MapGeneration : MonoBehaviour
         }
         else
         {
-            Combination(result, new List<Vertex>(comb), r, depth + 1);
+            combination(result, new List<Vertex>(comb), r, depth + 1);
 
             comb.Add(vertex_list_[depth]);
-            Combination(result, new List<Vertex>(comb), r - 1, depth + 1);
+            combination(result, new List<Vertex>(comb), r - 1, depth + 1);
         }
     }
 
-    private void setupCheckedTriangle()
+    private void setCheckedTriangle()
     {
         List<Triangle> result = new List<Triangle>();
 
@@ -240,14 +219,14 @@ public class MapGeneration : MonoBehaviour
         triangle_arr_ = result.ToArray();
     }
 
-    private void setupGraph()
+    private void setGraph()
     {
-        bool[,] is_value = new bool[selecte_room_count_, selecte_room_count_];
+        bool[,] is_value = new bool[stage_data_.target_room_count, stage_data_.target_room_count];
         List<LineData> line_graph_list = new List<LineData>();
 
-        for (int i = 0; i < selecte_room_count_; i++)
+        for (int i = 0; i < stage_data_.target_room_count; i++)
         {
-            for (int j = 0; j < selecte_room_count_; j++)
+            for (int j = 0; j < stage_data_.target_room_count; j++)
             {
                 is_value[i, j] = false;
             }
@@ -309,7 +288,8 @@ public class MapGeneration : MonoBehaviour
             int f = cur_edge.start.no;
             int s = cur_edge.end.no;
 
-            if (findRoot(parent, f) == findRoot(parent, s)){
+            if (findRoot(parent, f) == findRoot(parent, s))
+            {
                 continue;
             }
 
@@ -328,7 +308,7 @@ public class MapGeneration : MonoBehaviour
     {
         foreach (var unselected_line in unselected_lines_)
         {
-            if(Random.RandomRange(0f, 100f) < additional_route_chance_)
+            if (Random.RandomRange(0f, 100f) < stage_data_.additional_route_chance)
             {
                 vertex_graph_.Add(unselected_line);
             }
@@ -337,38 +317,38 @@ public class MapGeneration : MonoBehaviour
 
     private Vector2Int getTilePos(Vector2 _real_pos)
     {
-        return new Vector2Int(Mathf.RoundToInt((_real_pos.x - 0.16f) / 0.32f), Mathf.RoundToInt((_real_pos.y - 0.16f) / 0.32f));
+        return new Vector2Int(Mathf.RoundToInt((_real_pos.x - tile_size_ / 2) / tile_size_), Mathf.RoundToInt((_real_pos.y - tile_size_ / 2) / tile_size_));
     }
 
     private Vector2 getRealPos(Vector2Int _tile_pos)
     {
-        return new Vector2(_tile_pos.x * 0.32f + 0.16f, _tile_pos.y * 0.32f + 0.16f);
+        return new Vector2(_tile_pos.x * tile_size_ + tile_size_ / 2, _tile_pos.y * tile_size_ + tile_size_ / 2);
     }
 
     private Vector2 getRealPos(int x, int y)
     {
-        return new Vector2(x * 0.32f + 0.16f, y * 0.32f + 0.16f);
+        return new Vector2(x * tile_size_ + tile_size_ / 2, y * tile_size_ + tile_size_ / 2);
     }
 
     private Vector2 getIncludeTilePos(Direction _dir, Vector2 _pos)
     {
         var correct_vec = _pos + Utility.direction_to_vector[_dir] * 0.01f;
-        var temp = new Vector2Int(Mathf.RoundToInt((correct_vec.x - 0.16f) / 0.32f), Mathf.RoundToInt((correct_vec.y - 0.16f) / 0.32f));
+        var temp = new Vector2Int(Mathf.RoundToInt((correct_vec.x - tile_size_ / 2) / tile_size_), Mathf.RoundToInt((correct_vec.y - tile_size_ / 2) / tile_size_));
         return getRealPos(temp);
     }
 
-    private void setupTileArray()
+    private void setTileArray()
     {
         float map_min_x = float.MaxValue;
         float map_min_y = float.MaxValue;
         float map_max_x = float.MinValue;
         float map_max_y = float.MinValue;
 
-        int room_count = MapManager.instance.tile_map.getRoomLength();
-
+        int room_count = tile_map_.getRoomLength(); 
+        
         for (int i = 0; i < room_count; i++)
         {
-            Room room = MapManager.instance.tile_map.getRoom(i);
+            Room room = tile_map_.getRoom(i);
             map_min_x = Mathf.Min(map_min_x, room.position.x);
             map_min_y = Mathf.Min(map_min_y, room.position.y);
 
@@ -376,27 +356,27 @@ public class MapGeneration : MonoBehaviour
             map_max_y = Mathf.Max(map_max_y, room.position.y + room.room_size.y);
         }
 
-        int world_width = Mathf.RoundToInt((map_max_x - map_min_x) / 0.32f) + 10;
-        int world_height = Mathf.RoundToInt((map_max_y - map_min_y) / 0.32f) + 10;
-        Vector2Int world_tile_origin = new Vector2Int(Mathf.RoundToInt((map_min_x) / 0.32f) - 5, Mathf.RoundToInt((map_min_y) / 0.32f) - 5);
+        int world_width = Mathf.RoundToInt((map_max_x - map_min_x) / tile_size_) + 10;
+        int world_height = Mathf.RoundToInt((map_max_y - map_min_y) / tile_size_) + 10;
+        Vector2Int world_tile_origin = new Vector2Int(Mathf.RoundToInt((map_min_x) / tile_size_) - 5, Mathf.RoundToInt((map_min_y) / tile_size_) - 5);
 
 
-        MapManager.instance.tile_map.setWorldPos(world_width, world_height, world_tile_origin);
+        tile_map_.setWorldPos(world_width, world_height, world_tile_origin);
 
         for (int i = 0; i < room_count; i++)
         {
-            Room room = MapManager.instance.tile_map.getRoom(i);
-            int x_size = Mathf.RoundToInt(room.room_size.x / 0.32f);
-            int y_size = Mathf.RoundToInt(room.room_size.y / 0.32f);
+            Room room = tile_map_.getRoom(i);
+            int x_size = Mathf.RoundToInt(room.room_size.x / tile_size_);
+            int y_size = Mathf.RoundToInt(room.room_size.y / tile_size_);
 
             for (int x = 0; x < x_size; x++)
             {
                 for (int y = 0; y < y_size; y++)
                 {
                     Vector2Int curr_pos = new Vector2Int(
-                        Mathf.RoundToInt((room.position.x) / 0.32f + x),
-                        Mathf.RoundToInt((room.position.y) / 0.32f + y));
-                    MapManager.instance.tile_map.setTileByArrayPos(curr_pos, 1);
+                        Mathf.RoundToInt((room.position.x) / tile_size_ + x),
+                        Mathf.RoundToInt((room.position.y) / tile_size_ + y));
+                    tile_map_.setTileByArrayPos(curr_pos, 1);
                 }
             }
         }
@@ -417,8 +397,8 @@ public class MapGeneration : MonoBehaviour
 
     private void linkRoom(LineData _line)
     {
-        Room start_room = MapManager.instance.tile_map.getRoom(_line.start.no);
-        Room end_room = MapManager.instance.tile_map.getRoom(_line.end.no);
+        Room start_room = tile_map_.getRoom(_line.start.no);
+        Room end_room = tile_map_.getRoom(_line.end.no);
         Vector3 start_room_pos = _line.start.getVecter3();
         Vector3 end_room_pos = _line.end.getVecter3();
 
@@ -450,13 +430,13 @@ public class MapGeneration : MonoBehaviour
             int incr_y = dir_int.y > 0 ? 1 : -1;
             while (true)
             {
-                MapManager.instance.tile_map.setTileByWorldPos(start.Value + new Vector2(curr_x, curr_y) * 0.32f, 1);
+                tile_map_.setTileByWorldPos(start.Value + new Vector2(curr_x, curr_y) * tile_size_, 1);
 
                 if (curr_y == dir_int.y && curr_x == dir_int.x) break;
 
                 if (curr_x == dir_int.x / 2)
                 {
-                    if(curr_y == dir_int.y)
+                    if (curr_y == dir_int.y)
                     {
                         curr_x += incr_x;
                     }
@@ -479,7 +459,7 @@ public class MapGeneration : MonoBehaviour
             int incr_y = dir_int.y > 0 ? 1 : -1;
             while (true)
             {
-                MapManager.instance.tile_map.setTileByWorldPos(start.Value + new Vector2(curr_x, curr_y) * 0.32f, 1);
+                tile_map_.setTileByWorldPos(start.Value + new Vector2(curr_x, curr_y) * tile_size_, 1);
 
                 if (curr_y == dir_int.y && curr_x == dir_int.x) break;
 
@@ -525,7 +505,7 @@ public class MapGeneration : MonoBehaviour
     {
         for (int i = 0; i < _length; i++)
         {
-            MapManager.instance.tile_map.setTileByWorldPos(_pos + Utility.direction_to_vector[_direction] * i * 0.32f, 1);
+            tile_map_.setTileByWorldPos(_pos + Utility.direction_to_vector[_direction] * i * tile_size_, 1);
         }
     }
 
@@ -600,6 +580,7 @@ public class Vertex
     public int no;
     public float x;
     public float y;
+
     public Vertex(int _no, float _x, float _y)
     {
         this.no = _no;
@@ -696,6 +677,7 @@ public class LineData
 {
     public Vertex start;
     public Vertex end;
+
     public LineData(Vertex _start, Vertex _end)
     {
         if (_start.no >= _end.no)

@@ -5,7 +5,7 @@ using UnityEngine;
 public class TurnSystem : Singleton<TurnSystem>
 {
     private List<Enemy> actable_enemy_list_ = new List<Enemy>();
-
+        
     public void runTurn(float _action_value)
     {
         Queue<Enemy> action_queue = new Queue<Enemy>();

@@ -16,7 +16,7 @@ public class Tile : MonoBehaviour
     private SpriteRenderer cloud_rd_;
 
     public int tile_type { get => tile_type_; }
-    public Vector2Int tile_pos { get => MapManager.instance.tile_map.convertWorldPos2TilePos(transform.position); }
+    public Vector2Int tile_pos { get => MapManager.instance.getCurMap().convertWorldPos2TilePos(transform.position); }
     public TileData tile_data { get => tile_data_; }
     public PathData path_data { get => path_data_; }
     public GameObject entity_go { get => entity_parent_.GetChild(0).gameObject; }
@@ -68,10 +68,10 @@ public class Tile : MonoBehaviour
     {
         if (tile_data_.is_wall)
         {
-            var my_pos = MapManager.instance.tile_map.convertWorldPos2TilePos(transform.position);
+            var my_pos = MapManager.instance.getCurMap().convertWorldPos2TilePos(transform.position);
             cloud_rd_.color = Color.white;
 
-            foreach (var item in MapManager.instance.tile_map.getNeighbourTile(my_pos))
+            foreach (var item in MapManager.instance.getCurMap().getNeighbourTile(my_pos))
             {
                 if (!item.tile_data_.is_wall)
                 {

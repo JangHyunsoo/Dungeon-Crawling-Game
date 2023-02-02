@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ad73522184a7c24a931731805f434df, type: 3}
+  m_Name: 00.green_slime
+  m_EditorClassIdentifier: 
+  entity_name_: green slime
+  index_no_: 0
+  base_hp_: 10
+  base_hp_regen_: 1
+  base_mp_: 0
+  base_mp_regen_: 0
+  physical_damage_: 10
+  armor_value_: 0
+  action_value_: 1
+  rarlity_: 0
+  color_: {r: 0, g: 0, b: 0, a: 0}
+  sprite_: {fileID: 21300000, guid: d7ab346daf3dc8b4089e015c47d1cd21, type: 3}
