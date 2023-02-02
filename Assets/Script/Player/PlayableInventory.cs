@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class PlayableInventory : MonoBehaviour
 {
@@ -9,9 +11,10 @@ public class PlayableInventory : MonoBehaviour
 
     public void init()
     {
-        item_arr_ = new Item[INVENTORY_SIZE_];
+        item_arr_ = Enumerable.Repeat<Item>(null, INVENTORY_SIZE_).ToArray();
+        UIManager.instance.inventory_ui.init();
         addItem(new Weapon(ItemDatabase.instance.getItemData(0)));
-        UIManager.instance.inventory_ui.updateItemSlots();
+        addItem(new Armor(ItemDatabase.instance.getItemData(6)));
     }
 
     public Item getItemToIndexNum(int _index)
@@ -26,7 +29,7 @@ public class PlayableInventory : MonoBehaviour
             if(item_arr_[i] == null)
             {
                 item_arr_[i] = item;
-                UIManager.instance.inventory_ui.updateItemSlot(i);
+                UIManager.instance.inventory_ui.updateItemSlots();
                 return;
             }
         }

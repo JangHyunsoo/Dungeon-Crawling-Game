@@ -30,6 +30,68 @@ public class PlayableEquipment : MonoBehaviour
     }
 
 
+    public Item getEquipItem(ItemType _item_type, int _idx = 0)
+    {
+        switch (_item_type)
+        {
+            case ItemType.WEAPON:
+                return weapon_;
+            case ItemType.ARMOR:
+                return armor_;
+            case ItemType.RING:
+                return ring_arr_[_idx];
+            default:
+                return null;
+        }
+    }
+
+    public void unequipItem(ItemType _item_type, int _idx = 0)
+    {
+        switch (_item_type)
+        {
+            case ItemType.WEAPON:
+                unequipWeapon();
+                break;
+            case ItemType.ARMOR:
+                unequipArmor();
+                break;
+            case ItemType.RING:
+                unequipRing(_idx);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void equipItem(Item _item)
+    {
+        switch (_item.item_data.item_type)
+        {
+            case ItemType.WEAPON:
+                weapon_ = (Weapon)_item;
+                break;
+            case ItemType.ARMOR:
+                armor_ = (Armor)_item;
+                break;
+            case ItemType.RING:
+                if (ring_arr_[0] != none_ring_)
+                {
+                    ring_arr_[0] = (Ring)_item;
+                }
+                else if(ring_arr_[1] != none_ring_)
+                {   
+                    ring_arr_[1] = (Ring)_item;
+                }
+                else
+                {
+                    ring_arr_[0] = (Ring)_item;
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
     public void equipWeapon(Weapon _weapon)
     {
         weapon_ = _weapon;

@@ -74,6 +74,16 @@ public class Utility
         return (AptitudeType)(int)_weapon_type;
     }
 
+    public static Transform[] getChildsTransform(Transform parent_)
+    {
+        Transform[] ret = new Transform[parent_.childCount];
+        for (int i = 0; i < parent_.childCount; i++)
+        {
+            ret[i] = parent_.GetChild(i);
+        }
+        return ret;
+    }
+
     public static int getAmountRandom(float[] amount_arr)
     {
         float total_amount = 0;

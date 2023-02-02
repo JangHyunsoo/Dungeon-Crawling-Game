@@ -8,7 +8,13 @@ public class InventoryUI : MonoBehaviour
     [SerializeField]
     private ItemSlotUI[] item_slot_ui_arr_;
 
-    private int cur_seleted_slot_num_;
+    public void init()
+    {
+        for (int i = 0; i < item_slot_ui_arr_.Length; i++)
+        {
+            item_slot_ui_arr_[i].setIndex(i);
+        }
+    }
 
     public void updateItemSlots()
     {
@@ -20,6 +26,6 @@ public class InventoryUI : MonoBehaviour
 
     public void updateItemSlot(int _idx)
     {
-        item_slot_ui_arr_[_idx].setItemSlotData(_idx);
+        item_slot_ui_arr_[_idx].setItemSlotData();
     }
 }

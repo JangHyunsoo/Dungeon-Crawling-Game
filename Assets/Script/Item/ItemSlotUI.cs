@@ -11,18 +11,23 @@ public class ItemSlotUI : MonoBehaviour, IPointerClickHandler
     [SerializeField]
     private Text item_amount_;
 
-    private int item_data_index_;
+    [SerializeField]
+    private int item_index_;
 
-    public void setItemSlotData(int _index)
+    public void setIndex(int _idx)
     {
-        item_data_index_ = _index;
-        var item = PlayerManager.instance.playable.playable_inventory.getItemToIndexNum(_index);
+        item_index_ = _idx;
+    }
+
+    public void setItemSlotData()
+    {
+        var item = PlayerManager.instance.playable.playable_inventory.getItemToIndexNum(item_index_);
 
         if(item != null)
         {
             item_image_.color = Color.white;
             item_image_.sprite = item.item_data.item_sprite;
-            item_amount_.text = item.amount.ToString();
+            item_amount_.text = item.amount == 1 ? "" : item.amount.ToString();
         }
         else
         {
@@ -35,7 +40,13 @@ public class ItemSlotUI : MonoBehaviour, IPointerClickHandler
     {
         if (eventData.button == PointerEventData.InputButton.Left)
         {
-            Debug.Log(item_data_index_);
+            var item = PlayerManager.instance.playable.playable_inventory.getItemToIndexNum(item_index_);
+            
+            if(item != null)
+            {
+                PlayerManager.instance.playable.playable_equipment.equipItem(item);
+                UIManager.instance.equip_ui.updateSlots();
+            }
         }
     }
 }
