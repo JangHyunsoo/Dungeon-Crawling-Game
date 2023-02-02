@@ -9,7 +9,7 @@ public class PickUpUI : MonoBehaviour
 
     public void updatePickUpByTilePos(Vector2Int tile_pos)
     {
-        Tile tile = MapManager.instance.tile_map.getTileByTilePos(tile_pos);
+        Tile tile = MapManager.instance.getCurMap().getTileByTilePos(tile_pos);
         DropItem[] dropItems = tile.getDropItems();
 
         for (int i = 0; i < pickup_slot_arr_.Length; i++)

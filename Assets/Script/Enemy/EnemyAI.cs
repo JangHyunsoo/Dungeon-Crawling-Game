@@ -17,7 +17,7 @@ public class EnemyAI : MonoBehaviour
         }
         else
         {
-            if (MapManager.instance.tile_map.getTileByTilePos(path_list_[0]).walkable)
+            if (MapManager.instance.getCurMap().getTileByTilePos(path_list_[0]).walkable)
             {
                 move(path_list_[0]);
             }
@@ -27,13 +27,13 @@ public class EnemyAI : MonoBehaviour
     public void move(Vector2Int pos)
     {
         curr_pos_ = pos;
-        transform.position = MapManager.instance.tile_map.getRealPosByTilePos(curr_pos_);
-        MapManager.instance.tile_map.getTileByTilePos(curr_pos_).setChildEntity(transform);
+        transform.position = MapManager.instance.getCurMap().getRealPosByTilePos(curr_pos_);
+        MapManager.instance.getCurMap().getTileByTilePos(curr_pos_).setChildEntity(transform);
     }
 
     protected void getPath()
     {
         var target_pos_ = PlayerMove.instance.curr_pos;
-        path_list_ = MapManager.instance.tile_map.findPath(curr_pos_, target_pos_, 100);
+        path_list_ = MapManager.instance.getCurMap().findPath(curr_pos_, target_pos_, 100);
     }
 }

@@ -7,8 +7,8 @@ public class StageData : ScriptableObject
 {
     [Header("Room Info")]
     [SerializeField]
-    private int room_count_;
-    public int room_count { get => room_count_; }
+    private int target_room_count_;
+    public int target_room_count { get => target_room_count_; }
 
     [SerializeField]
     private int room_max_width_;
@@ -25,6 +25,10 @@ public class StageData : ScriptableObject
     [SerializeField]
     private int room_min_height_;
     public int room_min_height { get => room_min_height_; }
+
+    [SerializeField]
+    private float additional_route_chance_;
+    public float additional_route_chance { get => additional_route_chance_; }
 
     [Header("Monster Info")]
     [SerializeField]

@@ -7,12 +7,19 @@ public class MapManager : Singleton<MapManager>
     [SerializeField]
     private MapGeneration map_generation_;
     [SerializeField]
-    private TileMap tile_map_;
+    private List<TileMap> tile_map_list_ = new List<TileMap>();
+    public List<TileMap> tile_map_list { get => tile_map_list_; }
 
-    public TileMap tile_map { get => tile_map_; }
+    private int cur_stage_ = 0;
 
-    public IEnumerator init()
+    public IEnumerator generateMap(StageData _stage_data)
     {
-        yield return StartCoroutine(map_generation_.gernationMap());
+        yield return StartCoroutine(map_generation_.generate(_stage_data));
+        tile_map_list_.Add(map_generation_.tile_map);
+    }
+
+    public TileMap getCurMap()
+    {
+        return tile_map_list_[cur_stage_];
     }
 }

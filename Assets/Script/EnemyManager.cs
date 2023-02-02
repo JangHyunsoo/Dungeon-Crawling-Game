@@ -19,7 +19,7 @@ public class EnemyManager : Singleton<EnemyManager>
 
     public Enemy createEnemyInRandomTile(EnemyData enemy_data)
     {
-        TileMap tile_map = MapManager.instance.tile_map;
+        TileMap tile_map = MapManager.instance.getCurMap();
         var enemy_go = GameObject.Instantiate(enemy_prefab_);
         var enemy_cp = enemy_go.GetComponent<Enemy>();
         enemy_cp.enemy_ai.move(tile_map.getRandomRoomTilePos());

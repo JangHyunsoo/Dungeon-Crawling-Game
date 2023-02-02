@@ -33,7 +33,7 @@ public class PlayerMove : Singleton<PlayerMove>
 
     public void init()
     {
-        curr_pos_ = MapManager.instance.tile_map.getRandomRoomTilePos();
+        curr_pos_ = MapManager.instance.getCurMap().getRandomRoomTilePos();
         move(curr_pos_);
     }
 
@@ -41,8 +41,8 @@ public class PlayerMove : Singleton<PlayerMove>
     {
         updateSurroundTileView(false);
         curr_pos_ = pos;
-        transform.position = MapManager.instance.tile_map.getRealPosByTilePos(curr_pos_);
-        MapManager.instance.tile_map.getTileByTilePos(curr_pos_).setChildEntity(transform);
+        transform.position = MapManager.instance.getCurMap().getRealPosByTilePos(curr_pos_);
+        MapManager.instance.getCurMap().getTileByTilePos(curr_pos_).setChildEntity(transform);
         UIManager.instance.pickup_ui.updatePickUpByTilePos(curr_pos);
         updateSurroundTileView(true);
     }
@@ -50,9 +50,9 @@ public class PlayerMove : Singleton<PlayerMove>
     public void movePlayer(int dir)
     {
         var pos = curr_pos_ + Utility.int_to_vector_int[dir];
-        if (MapManager.instance.tile_map.isOnMap(pos))
+        if (MapManager.instance.getCurMap().isOnMap(pos))
         {
-            if (MapManager.instance.tile_map.getTileByTilePos(pos).walkable)
+            if (MapManager.instance.getCurMap().getTileByTilePos(pos).walkable)
             {
                 move(pos);
             }
@@ -67,9 +67,9 @@ public class PlayerMove : Singleton<PlayerMove>
             for (int x = -view_range + y; x <= view_range - y; x++)
             {
                 var pos = curr_pos_ + new Vector2Int(x, y);
-                if (MapManager.instance.tile_map.isOnMap(pos))
+                if (MapManager.instance.getCurMap().isOnMap(pos))
                 {
-                    var tile = MapManager.instance.tile_map.getTileByTilePos(pos);
+                    var tile = MapManager.instance.getCurMap().getTileByTilePos(pos);
                     tile.updateVisible(can_view);
                 }
                    
@@ -81,9 +81,9 @@ public class PlayerMove : Singleton<PlayerMove>
             for (int x = -view_range - y; x <= view_range + y; x++)
             {
                 var pos = curr_pos_ + new Vector2Int(x, y);
-                if (MapManager.instance.tile_map.isOnMap(pos))
+                if (MapManager.instance.getCurMap().isOnMap(pos))
                 {
-                    var tile = MapManager.instance.tile_map.getTileByTilePos(pos);
+                    var tile = MapManager.instance.getCurMap().getTileByTilePos(pos);
                     tile.updateVisible(can_view);
                 }
             }
