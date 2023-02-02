@@ -8,8 +8,13 @@ public class PlayerManager : Singleton<PlayerManager>
     private Playable playable_;
     public Playable playable { get => playable_; }
 
-    public void Start()
+    [SerializeField]
+    private PlayerMove player_move_;
+    public PlayerMove player_move { get => player_move_; }
+
+    public void init()
     {
         playable_.init(0);
+        player_move_.init();
     }
 }

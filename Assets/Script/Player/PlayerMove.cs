@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerMove : Singleton<PlayerMove>
+public class PlayerMove : MonoBehaviour
 {
-    private Vector2Int curr_pos_; // tile pos
+    private Vector2Int curr_pos_;
     public Vector2Int curr_pos { get => curr_pos_; }
 
     public void Update()

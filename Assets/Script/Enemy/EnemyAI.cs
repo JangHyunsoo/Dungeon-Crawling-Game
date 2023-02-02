@@ -33,7 +33,7 @@ public class EnemyAI : MonoBehaviour
 
     protected void getPath()
     {
-        var target_pos_ = PlayerMove.instance.curr_pos;
+        var target_pos_ = PlayerManager.instance.player_move.curr_pos;
         path_list_ = MapManager.instance.tile_map.findPath(curr_pos_, target_pos_, 100);
     }
 }

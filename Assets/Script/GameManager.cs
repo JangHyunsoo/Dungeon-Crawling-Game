@@ -27,7 +27,7 @@ public class GameManager : Singleton<GameManager>
     private IEnumerator initManagerCoroutine()
     {
         yield return StartCoroutine(MapManager.instance.init());
-        PlayerMove.instance.init();
+        PlayerManager.instance.init();
         EnemyManager.instance.startStage();
         ItemManager.instance.init();
         start_game_ = true;
