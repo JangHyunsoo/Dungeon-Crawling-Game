@@ -42,11 +42,11 @@ public class PlayerMove : MonoBehaviour
         updateSurroundTileView(false);
         curr_pos_ = pos;
         transform.position = MapManager.instance.getCurMap().getRealPosByTilePos(curr_pos_);
-        MapManager.instance.getCurMap().getTileByTilePos(curr_pos_).setChildEntity(transform);
+        MapManager.instance.getCurMap().getTileByTilePos(curr_pos_).addEntity(transform);
         UIManager.instance.pickup_ui.updatePickUpByTilePos(curr_pos);
         updateSurroundTileView(true);
     }
-    
+
     public void movePlayer(int dir)
     {
         var pos = curr_pos_ + Utility.int_to_vector_int[dir];

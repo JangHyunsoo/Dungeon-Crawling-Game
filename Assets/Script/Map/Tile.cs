@@ -6,6 +6,7 @@ public class Tile : MonoBehaviour
 {
     private int tile_type_;
     private TileData tile_data_;
+    private Vector2Int tile_pos_;
     private PathData path_data_ = new PathData();
 
     [SerializeField]
@@ -13,19 +14,28 @@ public class Tile : MonoBehaviour
     [SerializeField]
     private Transform item_parent_;
     [SerializeField]
+    private Transform object_parent_;
+
+    [SerializeField]
     private SpriteRenderer cloud_rd_;
 
     public int tile_type { get => tile_type_; }
-    public Vector2Int tile_pos { get => MapManager.instance.getCurMap().convertWorldPos2TilePos(transform.position); }
+    public Vector2Int tile_pos { get => tile_pos_; }
     public TileData tile_data { get => tile_data_; }
     public PathData path_data { get => path_data_; }
     public GameObject entity_go { get => entity_parent_.GetChild(0).gameObject; }
     public bool is_under_item { get => item_parent_.childCount != 0; }
+    public bool is_under_object { get => object_parent_.childCount != 0; }
     public bool is_under_entity { get => entity_parent_.childCount != 0; }
     public bool walkable { get => tile_data_.walkable && !is_under_entity; }
     public bool walkable_without_player { get => tile_data_.walkable && (!is_under_entity || entity_go.CompareTag("Player")); }
 
     private Color memory_color = new Color(1f, 1f, 1f, 0.5f);
+
+    public void setTilePos(Vector2Int pos)
+    {
+        tile_pos_ = pos;
+    }
 
     public Item getDropItem(int _idx)
     {
@@ -59,7 +69,19 @@ public class Tile : MonoBehaviour
         cloud_rd_.color = Color.white;
     }
 
-    public void setChildEntity(Transform _entity_go)
+    public void addObject(TileObject _tile_object)
+    {
+        _tile_object.transform.SetParent(object_parent_);
+        _tile_object.transform.position = object_parent_.position;
+        _tile_object.setTilePos(tile_pos_);
+    }
+
+    public TileObject getTileObject(int _idx)
+    {
+        return object_parent_.GetChild(_idx).GetComponent<TileObject>();
+    }
+
+    public void addEntity(Transform _entity_go)
     {
         _entity_go.SetParent(entity_parent_);
     }

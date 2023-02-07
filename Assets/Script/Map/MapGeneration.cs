@@ -33,16 +33,18 @@ public class MapGeneration : MonoBehaviour
     private List<LineData> vertex_graph_ = new List<LineData>();
     private List<LineData> unselected_lines_ = new List<LineData>();
 
-    public IEnumerator generate(StageData _stage_data)
+    public IEnumerator generate(int _stage_no, StageData _stage_data)
     {
-        yield return StartCoroutine(logic(_stage_data));
+        yield return StartCoroutine(logic(_stage_no, _stage_data));
     }
 
-    private IEnumerator logic(StageData _stage_data)
+    private IEnumerator logic(int _stage_no, StageData _stage_data)
     {
         tile_map_ = GameObject.Instantiate(map_prefab_, Vector3.zero, Quaternion.identity).GetComponent<TileMap>();
+        tile_map_.transform.SetParent(transform);
         stage_data_ = _stage_data;
-
+        tile_map_.setStageNo(_stage_no);
+        clearGenerationInfo();
         generateRoom();
         controlColliderComponent(true);
         Time.timeScale = 20f;
@@ -58,6 +60,16 @@ public class MapGeneration : MonoBehaviour
         selectRandomRoute();
         setTileArray();
         linkRooms();
+        createStair();
+    }
+
+    private void clearGenerationInfo()
+    {
+        room_tr_list_.Clear();
+        vertex_list_.Clear();
+        triangle_arr_ = null;
+        vertex_graph_.Clear();
+        unselected_lines_.Clear();
     }
 
     private void generateRoom()
@@ -572,6 +584,23 @@ public class MapGeneration : MonoBehaviour
         pos = getIncludeTilePos(dir, pos);
 
         return new KeyValuePair<Direction, Vector2>(dir, pos);
+    }
+
+    public void createStair()
+    {
+        int stair_count = Random.Range(2, 3);
+        
+        if(tile_map_.stage_no != 0)
+        {
+            var pre_tile_map = MapManager.instance.getTileMap(tile_map_.stage_no - 1);
+            for (int i = 0; i < stair_count; i++)
+            {
+                Stair cur_stair = tile_map_.createStairRanndom();
+                Stair pre_stair = pre_tile_map.createStairRanndom();
+                cur_stair.setTargetInfo(pre_stair.my_floor, pre_stair.my_idx);
+                pre_stair.setTargetInfo(cur_stair.my_floor, cur_stair.my_idx);
+            }
+        }
     }
 }
 

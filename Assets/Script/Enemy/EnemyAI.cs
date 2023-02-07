@@ -28,7 +28,7 @@ public class EnemyAI : MonoBehaviour
     {
         curr_pos_ = pos;
         transform.position = MapManager.instance.getCurMap().getRealPosByTilePos(curr_pos_);
-        MapManager.instance.getCurMap().getTileByTilePos(curr_pos_).setChildEntity(transform);
+        MapManager.instance.getCurMap().getTileByTilePos(curr_pos_).addEntity(transform);
     }
 
     protected void getPath()

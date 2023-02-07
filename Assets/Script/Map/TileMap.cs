@@ -4,12 +4,24 @@ using UnityEngine;
 
 public class TileMap : MonoBehaviour
 {
-    private float tile_size_ = 0.32f;
+    private int stage_no_;
     private int world_width_;
     private int world_height_;
     private Room[] room_arr_;
     private Vector2Int world_tile_min_pos_;
     private Tile[,] world_tile_arr_;
+    private List<Stair> stair_list_ = new List<Stair>();
+
+    private float tile_size_ = 0.32f;
+
+    public int stage_no { get => stage_no_; }
+    public int stair_count { get => stair_list_.Count; }
+    public List<Stair> stair_list { get => stair_list_; }
+
+    public void setStageNo(int _stage_no)
+    {
+        stage_no_ = _stage_no;
+    }
 
     public void setRoomArr(List<Room> _room_list)
     {
@@ -24,6 +36,11 @@ public class TileMap : MonoBehaviour
     public int getRoomLength()
     {
         return room_arr_.Length;
+    }
+
+    public Stair getStair(int _idx)
+    {
+        return stair_list_[_idx];
     }
 
     public bool isOnMap(Vector2Int pos)
@@ -75,6 +92,7 @@ public class TileMap : MonoBehaviour
                 tile.name = (new Vector2Int(i, j) + world_tile_min_pos_).ToString();
                 tile.transform.SetParent(transform);
                 world_tile_arr_[i, j] = tile.GetComponent<Tile>();
+                world_tile_arr_[i,j].setTilePos(new Vector2Int(i, j) + world_tile_min_pos_);
             }
         }
     }
@@ -156,6 +174,18 @@ public class TileMap : MonoBehaviour
     {
         var tile_pos = getRandomRoomTilePos();
         return getTileByTilePos(tile_pos);
+    }
+
+    // create stair
+    public Stair createStairRanndom()
+    {
+        var go = TileDataBase.instance.createStair();
+        var tile = getRandomRoomTile();
+        var stair = go.GetComponent<Stair>();
+        stair.setMyInfo(stage_no_, stair_list_.Count);
+        tile.addObject(stair);
+        stair_list_.Add(stair);
+        return stair;
     }
 
     // A* path finding

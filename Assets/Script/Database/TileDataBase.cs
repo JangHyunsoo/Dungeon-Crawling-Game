@@ -4,10 +4,15 @@ using UnityEngine;
 
 public class TileDataBase : Singleton<TileDataBase>
 {
+    [Header("Tile Info")]
     [SerializeField]
     private GameObject tile_prefab_;
     [SerializeField]
     private TileData[] tile_data_arr_;
+
+    [Header("Object Info")]
+    [SerializeField]
+    private GameObject stair_prefab_;
 
     public void init()
     {
@@ -34,5 +39,10 @@ public class TileDataBase : Singleton<TileDataBase>
     public GameObject createTile(float x, float y, int _idx)
     {
         return createTile(new Vector2(x, y), _idx);
+    }
+
+    public GameObject createStair()
+    {
+        return GameObject.Instantiate(stair_prefab_);
     }
 }

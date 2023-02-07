@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class FollowPlayer : MonoBehaviour
 {
-    // Update is called once per frame
     void LateUpdate()
     {
         if (GameManager.instance.start_game)
