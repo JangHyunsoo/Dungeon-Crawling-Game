@@ -30,6 +30,7 @@ public class GameManager : Singleton<GameManager>
         PlayerManager.instance.init();
         EnemyManager.instance.startStage();
         ItemManager.instance.init();
+        UIManager.instance.init();
         start_game_ = true;
     }
 }

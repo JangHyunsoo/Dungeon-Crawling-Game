@@ -227,7 +227,7 @@ public class TileMap : MonoBehaviour
                     continue;
                 }
 
-                if(Vector2Int.Distance(startNode.tile_pos, neighbour.tile_pos) >= 5f)
+                if (Vector2Int.Distance(startNode.tile_pos, neighbour.tile_pos) >= 5f)
                 {
                     continue;
                 }
@@ -245,6 +245,7 @@ public class TileMap : MonoBehaviour
                 }
             }
         }
+
         return new List<Vector2Int>();
     }
 

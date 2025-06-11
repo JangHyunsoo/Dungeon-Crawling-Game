@@ -5,17 +5,13 @@ using UnityEngine;
 public class EnemyAI : MonoBehaviour
 {
     protected Vector2Int curr_pos_;
-    protected List<Vector2Int> path_list_;
+    protected List<Vector2Int> path_list_ = new List<Vector2Int>();
 
     public virtual void act()
     {
         getPath();
-
-        if (path_list_.Count == 0)
-        {
-
-        }
-        else
+        
+        if (path_list_.Count > 0)
         {
             if (MapManager.instance.getCurMap().getTileByTilePos(path_list_[0]).walkable)
             {
@@ -33,8 +29,7 @@ public class EnemyAI : MonoBehaviour
 
     protected void getPath()
     {
-
         var target_pos_ = PlayerManager.instance.player_move.curr_pos;
-        path_list_ = MapManager.instance.getCurMap().findPath(curr_pos_, target_pos_, 100);
+        path_list_ = MapManager.instance.getCurMap().findPath(curr_pos_, target_pos_, 50);
     }
 }

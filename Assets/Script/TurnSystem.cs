@@ -8,28 +8,33 @@ public class TurnSystem : Singleton<TurnSystem>
         
     public void runTurn(float _action_value)
     {
-        Queue<Enemy> action_queue = new Queue<Enemy>();
+        //Queue<Enemy> action_queue = new Queue<Enemy>();
+        //
+        //foreach (var cur_enemy in actable_enemy_list_)
+        //{
+        //    cur_enemy.increaseCurActionValue(_action_value);
+        //
+        //    if (cur_enemy.action_value <= cur_enemy.cur_action_value)
+        //    {
+        //        action_queue.Enqueue(cur_enemy);
+        //    }
+        //}
+        //
+        //while (action_queue.Count != 0)
+        //{
+        //    var cur_enemy = action_queue.Dequeue();
+        //    
+        //    cur_enemy.enemy_ai.act();
+        //
+        //    if (cur_enemy.action_value < cur_enemy.cur_action_value)
+        //    {
+        //        action_queue.Enqueue(cur_enemy);
+        //    }
+        //}
 
         foreach (var cur_enemy in actable_enemy_list_)
         {
-            cur_enemy.increaseCurActionValue(_action_value);
-
-            if (cur_enemy.action_value <= cur_enemy.cur_action_value)
-            {
-                action_queue.Enqueue(cur_enemy);
-            }
-        }
-
-        while (action_queue.Count != 0)
-        {
-            var cur_enemy = action_queue.Dequeue();
-            
             cur_enemy.enemy_ai.act();
-
-            if (cur_enemy.action_value < cur_enemy.cur_action_value)
-            {
-                action_queue.Enqueue(cur_enemy);
-            }
         }
     }
 

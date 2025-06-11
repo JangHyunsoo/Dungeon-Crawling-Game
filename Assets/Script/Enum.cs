@@ -71,3 +71,12 @@ public enum StatType
     ACTION_POINT,
     CASTING_CHANCE
 }
+
+public enum MenuType
+{
+    CONTROL,
+    INVENTORY,
+    EQUIPMENT,
+    SKILL,
+    STAT
+}

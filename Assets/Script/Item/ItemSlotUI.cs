@@ -45,7 +45,7 @@ public class ItemSlotUI : MonoBehaviour, IPointerClickHandler
             if(item != null)
             {
                 PlayerManager.instance.playable.playable_equipment.equipItem(item);
-                UIManager.instance.equip_ui.updateSlots();
+                //UIManager.instance.equip_ui.updateSlots();
             }
         }
     }

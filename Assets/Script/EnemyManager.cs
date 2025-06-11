@@ -10,10 +10,10 @@ public class EnemyManager : Singleton<EnemyManager>
 
     public void startStage()
     {
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < 10; i++)
         {
-            // var enemy_data = EnemyDatabase.instance.getRandomEnemyInTotalEnemy(StageManager.instance.curr_stage_data.mosnter_rand_amount_arr);
-            // createEnemyInRandomTile(enemy_data);
+            var enemy_data = EnemyDatabase.instance.getEnemyData(0); //getRandomEnemyInTotalEnemy(StageManager.instance.curr_stage_data.mosnter_rand_amount_arr);
+            createEnemyInRandomTile(enemy_data);
         }
     }
 
@@ -25,6 +25,7 @@ public class EnemyManager : Singleton<EnemyManager>
         enemy_cp.enemy_ai.move(tile_map.getRandomRoomTilePos());
         enemy_cp.initEnemyData(enemy_data.index_no);
         enemy_list_.Add(enemy_cp);
+        TurnSystem.instance.addActableEnemy(enemy_cp);
         return enemy_cp;
     }
 }

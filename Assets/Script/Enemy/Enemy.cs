@@ -17,15 +17,15 @@ public class Enemy : MonoBehaviour
     public int cur_hp { get => cur_hp_; }
 
     private float action_value_;
-    public float action_value { get => action_value; }
+    public float action_value { get => action_value_; }
 
     private float cur_action_value_; 
     public float cur_action_value { get => cur_action_value_; }
 
     public void initEnemyData(int _index)
     {
-        // enemy_data_ = EnemyDatabase.instance.getEnemyData(_index);
-        // cur_hp_ = enemy_data_.base_hp;
+        enemy_data_ = EnemyDatabase.instance.getEnemyData(_index);
+        cur_hp_ = enemy_data_.base_hp;
 
         // init temp value 
         action_value_ = 1f;
